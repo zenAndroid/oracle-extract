@@ -1,0 +1,14 @@
+digraph Automaton {
+    node [shape=point] INIT;
+    node [shape=circle];
+    rankdir = LR;
+    INIT -> q1;
+    q1 -> q1 [label="b/0"];
+    q1 -> q2 [label="a/0"];
+    q2 -> q2 [label="a/1"];
+    q2 -> q3 [label="b/0"];
+    q3 -> q4 [label="a/1"];
+    q3 -> q3 [label="b/0"];
+    q4 -> q4 [label="a/1"];
+    q4 -> q4 [label="b/1"];
+}

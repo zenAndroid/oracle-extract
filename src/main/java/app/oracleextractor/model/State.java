@@ -1,9 +1,8 @@
 package app.oracleextractor.model;
 
 
-
-
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Representing a state in the context of a Mealy Machine.
@@ -13,7 +12,7 @@ import java.util.ArrayList;
  *     <li>A `mach` variable that represents the machine this state belongs to.</li>
  *     <li>A set of transitions: represents the transitions that flow-out of this <code>State</code></li>
  * </ul>
- *
+ * <p>
  * This class also has a static member variable, `id`, which assigns each new <code>State</code> a new, unique ID.
  * These IDs are not used currently, but they might replace the naming scheme for this model, or they may simply be a last naming resort.
  *
@@ -27,11 +26,12 @@ public class State {
 
     /**
      * Standard constructor, needs a name.
+     *
      * @param name Name used for the <code>State</code>
      */
     public State(String name) {
         this.name = name;
-        id = id++;
+        // id = id++;
     }
 
     public static int getId() {
@@ -53,17 +53,17 @@ public class State {
     /**
      * Custom setter function that uses the var-arg syntax to allow easier transition creation/addition to the <code>State</code>.
      * <br />
-     *
+     * <p>
      * Might remove the @NotNull annotation since it adds an unnecessary dependency though.
+     *
      * @param argTransitions The transitions intended for addition into the <code>State</code>.
      */
-    public void setStateTransitions(Transition ... argTransitions) {
-        // Todo: figure out if this is even necessary.
-        stateTransitions = new ArrayList<Transition>();
-
-        for (Transition tr : argTransitions) {
-            stateTransitions.add(tr);
-        }
+    public void setStateTransitions(Transition... argTransitions) {
+        // Edit: done (prior taks to be done) : figure out if this is even necessary.
+        //       it is, leave it be, else you get NullPointerException
+        //       which makes sense as the field would be empty
+        stateTransitions = new ArrayList<>();
+        stateTransitions.addAll(Arrays.asList(argTransitions)); // Offered as an alternative syntax by Idea, will test!
     }
 
     public void setStateTransitions(ArrayList<Transition> argTransitions) {
@@ -101,8 +101,9 @@ public class State {
 
     /**
      * Method used to change machine's current state.
+     *
      * @param destinationState State to change to.
-     * Todo: Stop accessing mach's field directly, bad coding.
+     *
      */
     private void changeMachineState(State destinationState) {
         mach.changeState(destinationState);
@@ -114,6 +115,7 @@ public class State {
 
     /**
      * Method that allows a <code>State</code> to communicate a <code>Transition</code>'s output to its <code>Machine</code>.
+     *
      * @param transitionOutput The output.
      */
     private void emitOutput(Character transitionOutput) {

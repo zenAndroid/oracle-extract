@@ -6,7 +6,7 @@ package app.oracleextractor.model;
  * This differs significantly from the mathematical model, which can ba said of the entire model to be honest.
  * But the way it differs is that the mathematical model assumes that a singular transition holds both the source <code>State</code>
  * and the destination <code>State</code>, whereas in this model the transition BELONGS to a <i>specific</i> <code>State</code>.
- *
+ * <p>
  * Other than that, each <code>Transition</code> has:
  * <ul>
  *     <li>A transitionTrigger: The input that launches/triggers this transition.</li>
@@ -14,6 +14,7 @@ package app.oracleextractor.model;
  *     <li>A transitionValid: The boolean flag that determines if this transition is valid and applicable.</li>
  *     <li>A destinationState: The <code>State</code> taken after this transition takes place.</li>
  * </ul>
+ *
  * @author zenAndroid
  */
 public class Transition {
@@ -25,8 +26,9 @@ public class Transition {
 
     /**
      * <code>Transition</code> constructor, takes the trigger and the output resulting from this transition.
+     *
      * @param transitionTrigger Input token that triggers the transition.
-     * @param transitionOutput Output emitted when this transition takes place.
+     * @param transitionOutput  Output emitted when this transition takes place.
      */
     public Transition(Character transitionTrigger, Character transitionOutput) {
         commonInit();
@@ -37,9 +39,10 @@ public class Transition {
 
     /**
      * <code>Transition</code> constructor, take the trigger, the output, and the destination <code>State</code>
+     *
      * @param transitionTrigger Input token that triggers the transition.
-     * @param transitionOutput Output emitted when this transition takes place.
-     * @param destinationState The reluting <code>State</code> after this <code>Transition</code>.
+     * @param transitionOutput  Output emitted when this transition takes place.
+     * @param destinationState  The reluting <code>State</code> after this <code>Transition</code>.
      */
     public Transition(Character transitionTrigger, Character transitionOutput, State destinationState) {
         commonInit();
@@ -50,10 +53,11 @@ public class Transition {
 
     /**
      * <code>Transition</code> constructor that accepts also the <code>sourceState</code> to hold a reference to the source state;
+     *
      * @param transitionTrigger Input token that triggers the transition.
-     * @param transitionOutput Output emitted when this transition takes place.
-     * @param sourceState The <code>State</code> that 'emits' this <code>Transition</code>.
-     * @param destinationState The resulting <code>State</code> after this <code>Transition</code>.
+     * @param transitionOutput  Output emitted when this transition takes place.
+     * @param sourceState       The <code>State</code> that 'emits' this <code>Transition</code>.
+     * @param destinationState  The resulting <code>State</code> after this <code>Transition</code>.
      */
     public Transition(Character transitionTrigger, Character transitionOutput, State sourceState, State destinationState) {
         this.transitionTrigger = transitionTrigger;
@@ -113,6 +117,7 @@ public class Transition {
 
     /**
      * Essentialy a getter for <code>transitionValid</code>.
+     *
      * @return <code>transitionValid</code>
      */
     public Boolean isValid() {
@@ -121,6 +126,7 @@ public class Transition {
 
     /**
      * Method for testing whether the passed argument is equal to this <code>Transition</code>'s trigger.
+     *
      * @param trigger Input token being tested for (value) equality.
      * @return If the character (in this case) is the same as this <code>Transition</code>'s trigger.
      */

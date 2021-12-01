@@ -48,9 +48,9 @@ public class Machine {
         this.initialState = initialState;
         this.currentState = initialState;
         this.inputSequence = inputSequence;
+        this.pendingInput = true; // Just set up the input sequence, so obviously there IS pending input.
         this.inputAlphabet = inputAlphabet;
         this.outputAlphabet = outputAlphabet;
-        this.pendingInput = true;
     }
 
     /**
@@ -69,6 +69,7 @@ public class Machine {
         this.currentState = initialState;
         this.inputAlphabet = inputAlphabet;
         this.outputAlphabet = outputAlphabet;
+        this.inputSequence = new ArrayList<>(); // This is to avoid NullPointerExceptions
         this.pendingInput = false; /* Set to false because no inputSequence was passed in, so there is no input */
     }
 
@@ -77,6 +78,12 @@ public class Machine {
      */
     public Machine() {
         this.pendingInput = false;
+        states = new ArrayList<>();
+        initialState = new State();
+        currentState = new State();
+        inputSequence = new ArrayList<>();
+        inputAlphabet = Set.of();
+        outputAlphabet = Set.of();
     }
 
     public static void main(String[] args) {
@@ -88,9 +95,9 @@ public class Machine {
 
         Machine M = new Machine();
 
-        State s0 = new State("q0");
-        State s1 = new State("q1");
-        State s2 = new State("q2");
+        State s0 = new State();
+        State s1 = new State();
+        State s2 = new State();
 
         // Creating the transitions
 
@@ -145,7 +152,7 @@ public class Machine {
         // 9- CONSUME !!!
 
         // 1- States.
-        State q1 = new State("1"), q2 = new State("2"), q3 = new State("3"), q4 = new State("4");
+        State q1 = new State(), q2 = new State(), q3 = new State(), q4 = new State();
         // 2- Transitions
         Transition tr1 = new Transition('b', '0', q1); // q1
         Transition tr2 = new Transition('a', '0', q2); // q1
@@ -243,6 +250,7 @@ public class Machine {
 
     public void setInputSequence(ArrayList<Character> inputSequence) {
         this.inputSequence = inputSequence;
+        this.pendingInput = true; // Input is now pending since we just set it!
     }
 
     public Set<Character> getInputAlphabet() {
@@ -301,7 +309,6 @@ public class Machine {
      */
     public void consume(ArrayList<Character> input) {
         setInputSequence(input);
-        setPendingInput(true);
         initialState.consumeInputToken();
         while (isPending()) {
             currentState.consumeInputToken();
@@ -364,5 +371,17 @@ public class Machine {
             }
         }
         return b.append("}\n").toString();
+    }
+
+    /**
+     * To get access to all of the transitions linked to the machine.
+     * @return <code>Transition</code>s of the machine.
+     */
+    public ArrayList<Transition> getAllTransitions(){
+        ArrayList<Transition> returnValue = new ArrayList<>();
+        for (State state : getStates()){
+            returnValue.addAll(state.getStateTransitions());
+        }
+        return returnValue;
     }
 }

@@ -66,7 +66,7 @@ public class MainController implements Initializable {
         // 9- CONSUME !!!
 
         // 1- States.
-        State q1 = new State("q1"), q2 = new State("q2"), q3 = new State("q3"), q4 = new State("q4");
+        State q1 = new State(), q2 = new State(), q3 = new State(), q4 = new State();
         // 2- Transitions
         Transition tr1 = new Transition('b', '0', q1); // q1
         Transition tr2 = new Transition('a', '0', q2); // q1

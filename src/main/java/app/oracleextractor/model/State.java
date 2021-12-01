@@ -21,17 +21,20 @@ import java.util.Arrays;
 public class State {
     static int id = 0;
     Machine mach;
-    String name;
+    String stateName;
     ArrayList<Transition> stateTransitions;
 
     /**
-     * Standard constructor, needs a name.
-     *
-     * @param name Name used for the <code>State</code>
+     * <code>State</code> constructor.
      */
+    public State() {
+        stateTransitions = new ArrayList<>();
+        stateName = "q" + id;
+    }
+
     public State(String name) {
-        this.name = name;
-        // id = id++;
+        stateTransitions = new ArrayList<>();
+        stateName = name;
     }
 
     public static int getId() {
@@ -39,11 +42,11 @@ public class State {
     }
 
     public String getName() {
-        return name;
+        return stateName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.stateName = name;
     }
 
     public ArrayList<Transition> getStateTransitions() {
@@ -59,10 +62,14 @@ public class State {
      * @param argTransitions The transitions intended for addition into the <code>State</code>.
      */
     public void setStateTransitions(Transition... argTransitions) {
-        // Edit: done (prior taks to be done) : figure out if this is even necessary.
+        // Edit: done (prior tasks to be done) : figure out if this is even necessary.
         //       it is, leave it be, else you get NullPointerException
         //       which makes sense as the field would be empty
         stateTransitions = new ArrayList<>();
+        // Have to tell the transitions what their source transition is.
+        for (Transition t : argTransitions) {
+            t.setSourceState(this);
+        }
         stateTransitions.addAll(Arrays.asList(argTransitions)); // Offered as an alternative syntax by Idea, will test!
     }
 
@@ -84,6 +91,7 @@ public class State {
      *  Will turn it into a getter function given that it will/should make it easier to change the implementation,
      *  although i am not too convinced by this argument, since it is very unlikely that stateTransitions are ever changed,
      *  .... yeah actually i don't think i'll change this.
+     *  Also, This is the point you will need to change in order to handle non-determinism. MARK AS BOOKMARK
      */
     public void consumeInputToken() {
         Character currTrigger = mach.getNextInputToken();
@@ -103,14 +111,15 @@ public class State {
      * Method used to change machine's current state.
      *
      * @param destinationState State to change to.
-     *
      */
     private void changeMachineState(State destinationState) {
         mach.changeState(destinationState);
-        // mach.currentState = destinationState; // I was actually surprised this works at first since
-        // // we are accessing a class's field directly and the default initializer isn't public
-        // // It turns out the default initializer is package-private, meaning classes defined in the same package can access the fields.
-        // // Will change this though.
+        /*
+         mach.currentState = destinationState; // I was actually surprised this works at first since
+         // we are accessing a class's field directly and the default initializer isn't public
+         // It turns out the default initializer is package-private, meaning classes defined in the same package can access the fields.
+         // Will change this though.
+        */
     }
 
     /**

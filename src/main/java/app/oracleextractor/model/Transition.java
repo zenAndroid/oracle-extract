@@ -34,7 +34,8 @@ public class Transition {
         commonInit();
         this.transitionTrigger = transitionTrigger;
         this.transitionOutput = transitionOutput;
-        destinationState = null;
+        sourceState = new State();
+        destinationState = new State();
     }
 
     /**
@@ -42,12 +43,13 @@ public class Transition {
      *
      * @param transitionTrigger Input token that triggers the transition.
      * @param transitionOutput  Output emitted when this transition takes place.
-     * @param destinationState  The reluting <code>State</code> after this <code>Transition</code>.
+     * @param destinationState  The resulting <code>State</code> after this <code>Transition</code>.
      */
     public Transition(Character transitionTrigger, Character transitionOutput, State destinationState) {
         commonInit();
         this.transitionTrigger = transitionTrigger;
         this.transitionOutput = transitionOutput;
+        sourceState = new State();
         this.destinationState = destinationState;
     }
 
@@ -60,6 +62,7 @@ public class Transition {
      * @param destinationState  The resulting <code>State</code> after this <code>Transition</code>.
      */
     public Transition(Character transitionTrigger, Character transitionOutput, State sourceState, State destinationState) {
+        commonInit();
         this.transitionTrigger = transitionTrigger;
         this.transitionOutput = transitionOutput;
         this.sourceState = sourceState;
@@ -116,7 +119,7 @@ public class Transition {
     }
 
     /**
-     * Essentialy a getter for <code>transitionValid</code>.
+     * Essentially a getter for <code>transitionValid</code>.
      *
      * @return <code>transitionValid</code>
      */

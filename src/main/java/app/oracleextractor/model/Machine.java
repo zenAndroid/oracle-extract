@@ -46,7 +46,7 @@ public class Machine {
     public Machine(ArrayList<State> states, State initialState, ArrayList<Character> inputSequence, Set<Character> inputAlphabet, Set<Character> outputAlphabet) {
         this.states = states;
         this.initialState = initialState;
-        this.currentState = initialState;
+        this.currentState = initialState; // Notice that the current state is always initialized to the initial state.
         this.inputSequence = inputSequence;
         this.pendingInput = true; // Just set up the input sequence, so obviously there IS pending input.
         this.inputAlphabet = inputAlphabet;
@@ -66,7 +66,7 @@ public class Machine {
     public Machine(ArrayList<State> states, State initialState, Set<Character> inputAlphabet, Set<Character> outputAlphabet) {
         this.states = states;
         this.initialState = initialState;
-        this.currentState = initialState;
+        this.currentState = initialState;// Notice that the current state is always initialized to the initial state.
         this.inputAlphabet = inputAlphabet;
         this.outputAlphabet = outputAlphabet;
         this.inputSequence = new ArrayList<>(); // This is to avoid NullPointerExceptions
@@ -80,7 +80,7 @@ public class Machine {
         this.pendingInput = false;
         states = new ArrayList<>();
         initialState = new State();
-        currentState = new State();
+        currentState = initialState;
         inputSequence = new ArrayList<>();
         inputAlphabet = Set.of();
         outputAlphabet = Set.of();

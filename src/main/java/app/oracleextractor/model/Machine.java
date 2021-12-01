@@ -28,9 +28,12 @@ public class Machine {
     State initialState;
     State currentState;
     ArrayList<Character> inputSequence;
+    ArrayList<Character> producedOutput;
+    ArrayList<Character> receivedOutput;
     Set<Character> inputAlphabet;
     Set<Character> outputAlphabet;
     Boolean pendingInput;
+
 
     /**
      * Constructor for an object of the <code>Machine</code> class.
@@ -233,8 +236,10 @@ public class Machine {
     }
 
     public void setInitialState(State initialState) {
+        // This sets the initial state of the machine; it also sets the machine's current state;
         initialState.mach = this;
         this.initialState = initialState;
+        this.currentState = initialState;
     }
 
     public State getCurrentState() {
@@ -309,6 +314,7 @@ public class Machine {
      * @author zenAndroid
      */
     public void consume(ArrayList<Character> input) {
+        receivedOutput = input;
         setInputSequence(input);
         initialState.consumeInputToken();
         while (isPending()) {
@@ -335,6 +341,19 @@ public class Machine {
     }
 
     /**
+     * Method to extract all of the output produced by this machine.
+     *
+     * @return A string containing the entire output.
+     */
+    public String getProducedOutput() {
+        StringBuilder retVal = new StringBuilder(producedOutput.size());
+        for (Character ch : producedOutput) {
+            retVal.append(ch);
+        }
+        return retVal.toString();
+    }
+
+    /**
      * Methods implementing the business logic that deals with incoming input.
      * Depending on the program/application being developed, the machine's reaction to a transition can change.
      * This method allows the description of such a reaction.
@@ -350,7 +369,10 @@ public class Machine {
      * @param sourceTransition The output of the machine, given its global state.
      */
     public void processOutput(Character sourceTransition) {
-        System.out.println(sourceTransition);
+        producedOutput.add(sourceTransition); // Add the output to the list of outputs we've outputted.
+        System.out.println(sourceTransition); // Print it; todo: this is bad and hardcoded, is there even a fix?
+        // The issue here is that a machine might do something else with this output *other* than outputting it,
+        // wonder if i can use the Function class to achieve some flexibility, but that for after i get it working.
     }
 
     /**
@@ -360,6 +382,7 @@ public class Machine {
     public String toDot() {
         StringBuilder b = new StringBuilder("digraph Automaton {\n");
         b.append("    node [shape=point] INIT;\n");
+        b.append("    ").append(currentState.getName()).append(" ").append("[shape=\"doublecircle\"];\n");
         b.append("    node [shape=circle];\n");
         b.append("    rankdir = LR;\n");
         b.append("    INIT -> ").append(getInitialState().getName()).append(";\n");
@@ -376,11 +399,12 @@ public class Machine {
 
     /**
      * To get access to all of the transitions linked to the machine.
+     *
      * @return <code>Transition</code>s of the machine.
      */
-    public ArrayList<Transition> getAllTransitions(){
+    public ArrayList<Transition> getAllTransitions() {
         ArrayList<Transition> returnValue = new ArrayList<>();
-        for (State state : getStates()){
+        for (State state : getStates()) {
             returnValue.addAll(state.getStateTransitions());
         }
         return returnValue;

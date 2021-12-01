@@ -10,8 +10,13 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
+import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +31,8 @@ public class DebugController implements Initializable {
 
     @FXML
     WebView webView;
+
+    WebEngine engine;
 
     @FXML
     Button zoomOutButton, zoomResetButton, zoomInButton, sndInputButton, runMachineButton, stepMachineButton, resetMachineButton;
@@ -102,10 +109,43 @@ The transitions are created with their trigger, output, source states and destin
 
         debug.setStates(s1,s2,s3,s4);
 
-        debug.consume(new ArrayList<>(List.of('a','a','b','b','a','a')));
+        // debug.consume(new ArrayList<>(List.of('a','a','b','b','a','a')));
 
+        updateMachineView(debug);
         // 1 2 2 2 2 1
+    }
 
+    public void updateMachineView(Machine argMachine) {
 
+        try {
+            FileWriter dotfile = new FileWriter("input.dot");
+            dotfile.write(argMachine.toDot());
+            dotfile.close();
+            System.out.println("Aut.main()");
+        } catch (IOException e1) {
+            // TODO Semble marcher pour l'instant
+            e1.printStackTrace();
+        }
+
+        try {
+            ProcessBuilder pb = new ProcessBuilder("dot.exe", "input.dot", "-Tsvg");
+            /*
+             * File foo = new File("automaton.svg"); fooPath = Path.of(foo.getPath());
+             * pb.redirectOutput(foo);
+             */
+            BufferedReader reader = new BufferedReader(new InputStreamReader(pb.start().getInputStream()));
+            StringBuilder builder = new StringBuilder();
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
+                builder.append(System.getProperty("line.separator"));
+            }
+            String result = builder.toString();
+            engine = webView.getEngine();
+            engine.loadContent(result);
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
     }
 }

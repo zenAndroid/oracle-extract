@@ -3,6 +3,8 @@ package app.oracleextractor;
 import app.oracleextractor.model.Machine;
 import app.oracleextractor.model.State;
 import app.oracleextractor.model.Transition;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -43,12 +45,23 @@ public class DebugController implements Initializable {
     ButtonBar buttonBar;
 
     Machine machineOfInterest; // The 'current' machine.
+
+    public enum ZOOM {IN, OUT, RESET}
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        initializeUIElements();
         machineOfInterest = getDefaultMachine();
         updateMachineView(machineOfInterest);
         // 1 2 2 2 2 1
+    }
+
+    private void initializeUIElements() {
+
+        // Initialize zoom button behavior.
+        zoomOutButton.setOnAction(actionEvent -> zoomFunctionality(ZOOM.OUT)); // The lambda syntax is quite neat, ngl.
+        zoomInButton.setOnAction(actionEvent -> zoomFunctionality(ZOOM.IN));
+        zoomResetButton.setOnAction(actionEvent -> zoomFunctionality(ZOOM.RESET));
     }
 
     /**
@@ -163,6 +176,14 @@ public class DebugController implements Initializable {
         } catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
+        }
+    }
+
+    public void zoomFunctionality(ZOOM zoomDir){
+        switch (zoomDir){
+            case IN -> webView.setZoom(webView.getZoom()+0.1);
+            case OUT -> webView.setZoom(webView.getZoom()-0.1);
+            case RESET -> webView.setZoom(1.0);
         }
     }
 }

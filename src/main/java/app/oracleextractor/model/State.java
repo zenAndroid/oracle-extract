@@ -29,7 +29,7 @@ public class State {
      */
     public State() {
         stateTransitions = new ArrayList<>();
-        stateName = "q" + id;
+        stateName = "q" + id++;
     }
 
     public State(String name) {

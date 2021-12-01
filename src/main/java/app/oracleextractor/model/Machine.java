@@ -233,6 +233,7 @@ public class Machine {
     }
 
     public void setInitialState(State initialState) {
+        initialState.mach = this;
         this.initialState = initialState;
     }
 

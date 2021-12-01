@@ -66,7 +66,7 @@ public class MainController implements Initializable {
         // 9- CONSUME !!!
 
         // 1- States.
-        State q1 = new State(), q2 = new State(), q3 = new State(), q4 = new State();
+        State q1 = new State("s0"), q2 = new State("s1"), q3 = new State("s2"), q4 = new State("s3");
         // 2- Transitions
         Transition tr1 = new Transition('b', '0', q1); // q1
         Transition tr2 = new Transition('a', '0', q2); // q1
@@ -133,36 +133,10 @@ public class MainController implements Initializable {
 
     }
 
-    public static String fileReaderHelper(String fileName) {
-        StringBuilder b = new StringBuilder();
-        try {
-            File myObj = new File(fileName);
-            Scanner fileReader = new Scanner(myObj);
-            while (fileReader.hasNextLine()) {
-                b.append(fileReader.nextLine());
-            }
-            fileReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
-        return b.toString();
-    }
-
     public void startMining() {
         // TODO Auto-generated method stub
         System.out.println("Controller.startMining()");
         executionLogTextArea.appendText("Started Mining\n");
-        String contentOfFile = null;
-        try {
-            contentOfFile = Files.readString(fooPath);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        System.out.println("COntents of the file: " + fileReaderHelper("automaton.svg"));
-        engine = impreciseOracleView.getEngine();
-        engine.loadContent(contentOfFile);
     }
 
     public void stopMining() {

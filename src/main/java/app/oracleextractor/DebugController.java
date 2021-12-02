@@ -42,17 +42,19 @@ public class DebugController implements Initializable {
     @FXML
     ButtonBar buttonBar;
 
-    Machine machineOfInterest; // The 'current' machine.
+    Machine machineOfInterest, // The 'current' machine.
+            cloneOfInterest; // The clone of the main machine that is being debugged.
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeUIElements();
         machineOfInterest = getDefaultMachine();
+        cloneOfInterest = machineOfInterest.makeMachineCopy();
         updateMachineView(machineOfInterest);
         // 1 2 2 2 2 1
     }
 
-    private void initializeUIElements() {
+    public void initializeUIElements() {
 
         // Initialize zoom button behavior.
         zoomOutButton.setOnAction(actionEvent -> zoomFunctionality(ZOOM.OUT)); // The lambda syntax is quite neat, ngl.
@@ -68,6 +70,7 @@ public class DebugController implements Initializable {
         sndInputButton.setOnAction(actionEvent -> {
             // Set the text as input.
             var input = stringToList(sendingInputField.getText());
+            sendingInputField.setText(""); // Empty the input field.
             if (input.size() > 0) {
                 machineOfInterest.setInputSequence(input);
                 // Enable the button bar
@@ -87,7 +90,7 @@ public class DebugController implements Initializable {
         });
 
         resetMachineButton.setOnAction(actionEvent -> {
-            // machineOfInterest = initialMachine;
+            machineOfInterest = cloneOfInterest.makeMachineCopy();
             updateUI();
         });
     }
@@ -217,7 +220,6 @@ public class DebugController implements Initializable {
      *
      */
     public void updateUI() {
-        System.out.println("Updating UI");
         lblInput.setText("Input : " + machineOfInterest.getInputAsString());
         lblCurrentState.setText("Current State: " + machineOfInterest.getCurrentState().getName());
         lblLastOutput.setText("Last Output: " + machineOfInterest.getLastOutput());

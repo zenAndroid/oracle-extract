@@ -107,7 +107,7 @@ public class DebugController implements Initializable {
     }
 
     /**
-     * @return
+     * @return A default machine, hardcoded and used for testing purposes.
      */
     public Machine getDefaultMachine() {
 
@@ -178,7 +178,7 @@ public class DebugController implements Initializable {
     }
 
     /**
-     * @param argMachine
+     * @param argMachine The machine that will be displayed on the webView.
      */
     public void updateMachineView(Machine argMachine) {
 
@@ -199,7 +199,7 @@ public class DebugController implements Initializable {
              */
             BufferedReader reader = new BufferedReader(new InputStreamReader(pb.start().getInputStream()));
             StringBuilder builder = new StringBuilder();
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 builder.append(line);
                 builder.append(System.getProperty("line.separator"));
@@ -222,10 +222,11 @@ public class DebugController implements Initializable {
         lblCurrentState.setText("Current State: " + machineOfInterest.getCurrentState().getName());
         lblLastOutput.setText("Last Output: " + machineOfInterest.getLastOutput());
         lblOutput.setText("Output accumulator: " + machineOfInterest.getProducedOutput());
+        updateMachineView(machineOfInterest);
     }
 
     /**
-     * @param zoomDir
+     * @param zoomDir The direction of the zoom. (In/Out/Reset)
      */
     public void zoomFunctionality(ZOOM zoomDir) {
         switch (zoomDir) {

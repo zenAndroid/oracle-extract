@@ -29,7 +29,7 @@ public class Machine {
     State currentState;
     ArrayList<Character> inputSequence;
     ArrayList<Character> producedOutput;
-    ArrayList<Character> receivedOutput;
+    ArrayList<Character> receivedInput;
     Character lastOutput;
     Set<Character> inputAlphabet;
     Set<Character> outputAlphabet;
@@ -55,6 +55,7 @@ public class Machine {
         this.pendingInput = true; // Just set up the input sequence, so obviously there IS pending input.
         this.inputAlphabet = inputAlphabet;
         this.outputAlphabet = outputAlphabet;
+        this.producedOutput = new ArrayList<>();
     }
 
     /**
@@ -75,6 +76,7 @@ public class Machine {
         this.outputAlphabet = outputAlphabet;
         this.inputSequence = new ArrayList<>(); // This is to avoid NullPointerExceptions
         this.pendingInput = false; /* Set to false because no inputSequence was passed in, so there is no input */
+        this.producedOutput = new ArrayList<>();
     }
 
     /**
@@ -88,6 +90,7 @@ public class Machine {
         inputSequence = new ArrayList<>();
         inputAlphabet = Set.of();
         outputAlphabet = Set.of();
+        this.producedOutput = new ArrayList<>();
     }
 
     public static void main(String[] args) {
@@ -284,7 +287,7 @@ public class Machine {
         this.pendingInput = pendingInput;
     }
 
-    public Character getLastOutput(){
+    public Character getLastOutput() {
         return lastOutput;
     }
 
@@ -319,12 +322,24 @@ public class Machine {
      * @author zenAndroid
      */
     public void consume(ArrayList<Character> input) {
-        receivedOutput = input;
+        receivedInput = input;
         setInputSequence(input);
         initialState.consumeInputToken();
         while (isPending()) {
             currentState.consumeInputToken();
         }
+    }
+
+    public void consumeToken() {
+        // Offload the drudgery upon the current state and tell it to change things depending on its output
+        // todo: might have to check this implementation out when trying to change to non-determinism
+        if (isPending())
+            currentState.consumeInputToken();
+
+    }
+
+    public void consumeEntirely() {
+        consume(inputSequence);
     }
 
     /**
@@ -351,22 +366,18 @@ public class Machine {
      * @return A string containing the entire output.
      */
     public String getProducedOutput() {
-        StringBuilder retVal = new StringBuilder();
-        try {
-            retVal = new StringBuilder(producedOutput.size());
-            for (Character ch : producedOutput) {
-                retVal.append(ch);
-            }
+        StringBuilder retVal = new StringBuilder(producedOutput.size());
+        for (Character ch : producedOutput) {
+            retVal.append(ch);
         }
-        catch (NullPointerException exp){
-            retVal.append(" NO OUTPUT");
-        }
+        retVal.append(" NO OUTPUT");
         return retVal.toString();
     }
 
     /**
      * Method to get the input Sequence as a string.
-     * @return
+     *
+     * @return String representing output
      */
     public String getInputAsString() {
         StringBuilder retVal = new StringBuilder(inputSequence.size());
@@ -375,6 +386,7 @@ public class Machine {
         }
         return retVal.toString();
     }
+
     /**
      * Methods implementing the business logic that deals with incoming input.
      * Depending on the program/application being developed, the machine's reaction to a transition can change.
@@ -391,6 +403,7 @@ public class Machine {
      * @param sourceTransition The output of the machine, given its global state.
      */
     public void processOutput(Character sourceTransition) {
+        lastOutput = sourceTransition; // This is the lastoutput
         producedOutput.add(sourceTransition); // Add the output to the list of outputs we've outputted.
         System.out.println(sourceTransition); // Print it; todo: this is bad and hardcoded, is there even a fix?
         // The issue here is that a machine might do something else with this output *other* than outputting it,
@@ -432,12 +445,4 @@ public class Machine {
         return returnValue;
     }
 
-    public void consumeToken() {
-        // Todo: :|
-
-    }
-
-    public void consumeEntirely() {
-        // TODO :|
-    }
 }

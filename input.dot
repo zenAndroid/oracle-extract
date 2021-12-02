@@ -1,6 +1,6 @@
 digraph Automaton {
     node [shape=point] INIT;
-    q1 [shape="doublecircle"];
+    q2 [shape="doublecircle"];
     node [shape=circle];
     rankdir = LR;
     INIT -> q1;

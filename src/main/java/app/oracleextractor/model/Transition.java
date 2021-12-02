@@ -13,6 +13,8 @@ package app.oracleextractor.model;
  *     <li>A transitionOutput: The output that results for this transition being taken.</li>
  *     <li>A transitionValid: The boolean flag that determines if this transition is valid and applicable.</li>
  *     <li>A destinationState: The <code>State</code> taken after this transition takes place.</li>
+ *     <li>A destinationState: The <code>State</code> that generates this transition.</li>
+ *     <li>A boolean flag that determines is this transition has been taken in the execution of this machine.</li>
  * </ul>
  *
  * @author zenAndroid
@@ -23,6 +25,7 @@ public class Transition {
     Boolean transitionValid;
     State sourceState;
     State destinationState;
+    Boolean wasVisited;
 
     /**
      * <code>Transition</code> constructor, takes the trigger and the output resulting from this transition.
@@ -76,6 +79,7 @@ public class Transition {
 
         /* All transitions start out valid */
         transitionValid = true; // Autoboxing is automatic.
+        wasVisited = false; // always keep forgetting to initialize these ...
     }
 
     public Character getTransitionTrigger() {
@@ -125,6 +129,21 @@ public class Transition {
      */
     public Boolean isValid() {
         return transitionValid;
+    }
+
+    /**
+     * Sets the <code>wasVisited</code> flag to true.
+     */
+    public void setTaken() {
+        wasVisited = true;
+    }
+
+    /**
+     * Getter for the visited flag;
+     * @return <code>wasVisited</code>
+     */
+    public Boolean wasTaken(){
+        return wasVisited;
     }
 
     /**

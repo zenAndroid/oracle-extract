@@ -80,12 +80,12 @@ public class DebugController implements Initializable {
         });
 
         stepMachineButton.setOnAction(actionEvent -> {
-            machineOfInterest.consumeToken();
+            machineOfInterest.nonDeterministicallyConsumeToken();
             updateUI();
         });
 
         runMachineButton.setOnAction(actionEvent -> {
-            machineOfInterest.consumeEntirely();
+            machineOfInterest.nonDeterministicConsume();
             updateUI();
         });
 
@@ -156,6 +156,7 @@ public class DebugController implements Initializable {
         The transitions are created with their trigger, output, source states and destination states.
          */
         Transition t1 = new Transition('b', '2', s1, s2);
+        Transition tnd2 = new Transition('b', '2', s1, s4);
         Transition t2 = new Transition('a', '1', s1, s4);
         Transition t3 = new Transition('a', '2', s2, s1);
         Transition t4 = new Transition('b', '2', s2, s3);
@@ -163,11 +164,12 @@ public class DebugController implements Initializable {
         Transition t6 = new Transition('b', '2', s3, s1);
         Transition t7 = new Transition('b', '1', s4, s1);
         Transition t8 = new Transition('a', '2', s4, s3);
+        Transition tnd9 = new Transition('a', '2', s4, s2); // Non-determinism test
 
-        s1.setStateTransitions(t1, t2);
+        s1.setStateTransitions(t1, t2, tnd2);
         s2.setStateTransitions(t3, t4);
         s3.setStateTransitions(t5, t6);
-        s4.setStateTransitions(t7, t8);
+        s4.setStateTransitions(t7, t8, tnd9);
 
         debug.setInitialState(s1);
 

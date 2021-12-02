@@ -13,9 +13,11 @@ import java.util.Set;
  *     <li>An initial <code>State</code></li>
  *     <li>A current <code>State</code></li>
  *     <li>An <code>inputSequence</code>, representing the input sequence fed to the machine.</li>
+ *     <li>A <code>producedOutput</code>, representing the output produced so far.</li>
+ *     <li><code>lastOutput</code>, a variable that holds the last output produced in this machine.</li>
  *     <li>Two non-modifiable sets: (whether these will remain in the implementation as is, remains to be seen)
  *          <ul> <li><code>inputAlphabet</code>, A set of Character representing the input alphabet</li>
- *               <li><code>inputAlphabet</code>, A set of Character representing the output alphabet</li>
+ *               <li><code>outputAlphabet</code>, A set of Character representing the output alphabet</li>
  *          </ul>
  *     </li>
  *     <li><code>pendingInput</code>, a boolean flag representing whether there is still input.</li>
@@ -90,14 +92,10 @@ public class Machine {
         inputSequence = new ArrayList<>();
         inputAlphabet = Set.of();
         outputAlphabet = Set.of();
-        this.producedOutput = new ArrayList<>();
+        producedOutput = new ArrayList<>();
     }
 
     public static void main(String[] args) {
-        // write your code here
-
-        // Hardcoded machine (they are only for TEMPORARY testing purposes, i swear ...)
-
         // Creating the states;
 
         Machine M = new Machine();
@@ -134,6 +132,7 @@ public class Machine {
         M.setInputAlphabet(Set.of('a', 'b'));
         M.setOutputAlphabet(Set.of('0', '1'));
         M.setStates(s0, s1, s2);
+        var ho=M.makeMachineCopy();
 
         var inputSeq = new ArrayList<Character>();
         inputSeq.add('a');
@@ -190,7 +189,26 @@ public class Machine {
 
         System.out.println("Actually works, i cant believe it");
 
-        System.out.println(MM.toDot());
+        System.out.println(M.toDot());
+
+        System.out.println(ho.toDot());
+    }
+
+    /**
+     * Method for getting a state given its name and and array of states.
+     *
+     * @param newStates The array of <code>State</code>s to be looked through.
+     * @param name      The name of the <code>State</code>.
+     * @return The targeted <code>State</code>.
+     */
+    private static State getStateByName(ArrayList<State> newStates, String name) {
+        State retVal = null;
+        for (State s : newStates) {
+            if (s.getName().equals(name)) {
+                retVal = s;
+            }
+        }
+        return retVal;
     }
 
     /**
@@ -297,7 +315,7 @@ public class Machine {
      * @param destState Next state to change into.
      */
     public void changeState(State destState) {
-        currentState = destState;
+        setCurrentState(destState);
     }
 
     /**
@@ -313,16 +331,14 @@ public class Machine {
      * Here goes, the starting point of the execution of the Mealy Machine. <br />
      * It is passed an <code>ArrayList</code> of <code>Character</code>s of inputs, so steps are rather straight-forward:
      * 1- Set the machine input sequence to this.
-     * 2- Set the machine's <code>pendingInput</code> flag to true, since this is the case (the input was just initialized after all)
-     * 3- Notify the initial <code>State</code> so that it starts consuming the next input token.
-     * 4- Consumption of the <code>inputSequence</code> continues, until there ie none.
+     * 2- Notify the initial <code>State</code> so that it starts consuming the next input token.
+     * 3- Consumption of the <code>inputSequence</code> continues, until there ie none.
      * In other words, while input exists, consume it.
      *
      * @param input The input fed to the machine.
      * @author zenAndroid
      */
     public void consume(ArrayList<Character> input) {
-        receivedInput = input;
         setInputSequence(input);
         initialState.consumeInputToken();
         while (isPending()) {
@@ -370,7 +386,6 @@ public class Machine {
         for (Character ch : producedOutput) {
             retVal.append(ch);
         }
-        retVal.append(" NO OUTPUT");
         return retVal.toString();
     }
 
@@ -426,7 +441,11 @@ public class Machine {
             var stateTranses = s.getStateTransitions();
             for (Transition t : stateTranses) { // IF transition.visited() { append ("quelquechose syntax dot pour afficher le arrow en rouge") }
                 b.append("    ").append(s.getName()).append(" -> ").append(t.getDestinationState().getName()).append(" ");
-                b.append("[label=\"").append(t.getTransitionTrigger()).append("/").append(t.getTransitionOutput()).append("\"];\n");
+                b.append("[label=\"").append(t.getTransitionTrigger())
+                        .append("/")
+                        .append(t.getTransitionOutput())
+                        .append(t.wasTaken() ? "\", color=red];" : "\"];")
+                        .append("\n");
             }
         }
         return b.append("}\n").toString();
@@ -445,4 +464,50 @@ public class Machine {
         return returnValue;
     }
 
+    /**
+     * This function returns a clone of this machine.
+     * NOTE that you can only use this function sensibly <i>AFTER</i> the machine has been properly defined;
+     * E.g: the machine has valid <code>State</code>s, a valid initial <code>State</code>, etc.<br />
+     * Not doing this results in UB.
+     *
+     * @return <code>retval</code>, a clone of this machine.
+     */
+    public Machine makeMachineCopy() {
+        var retVal = new Machine(); // The new clone of this machine.
+        retVal.setInputAlphabet(getInputAlphabet()); // Yeah yeah
+        retVal.setOutputAlphabet(getOutputAlphabet()); // Yeah yeah
+        var newStates = new ArrayList<State>(); // The clones of the states.
+        for (State s : getStates()) {
+            newStates.add(new State(s.getName())); // Adding the new states based on the name of the old ones.
+        }
+        retVal.setStates(newStates); // Setting the new States in the new machine.
+        // Setting the new machine's initial state.
+        retVal.setInitialState(getStateByName(newStates, getInitialState().getName()));
+
+        // Now we will create the transitions, this might get hairy, but i will try to
+        // compactify the operations by making use of the constructors that allow me to set the source and destinaton
+        // states
+
+        var newTransitions = new ArrayList<Transition>();
+        for (Transition t : getAllTransitions()) {
+            newTransitions.add(new Transition(t.getTransitionTrigger(),
+                    t.getTransitionOutput(),
+                    getStateByName(newStates, t.getSourceState().getName()),
+                    getStateByName(newStates, t.getDestinationState().getName())));
+        } // Transitions added, now comes the dicey part ...adding the correct transitions to the correct states ...
+
+        for (State s : retVal.getStates()) {
+            // For every state of this new machine, we have to add to it the transition that come from it
+            var newStateTransitions = new ArrayList<Transition>();
+            // We go through the transitions and see the ones
+            // that have the same states this one on the sourceState field ...
+            for (Transition t : newTransitions) {
+                if (t.getSourceState().getName().equals(s.getName())) {
+                    newStateTransitions.add(t);
+                }
+            }
+            s.setStateTransitions(newStateTransitions);
+        }
+        return retVal;
+    }
 }

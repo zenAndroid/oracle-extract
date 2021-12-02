@@ -81,7 +81,6 @@
           <Button fx:id="runMachineButton" mnemonicParsing="false" text="Run" />
             <Button fx:id="stepMachineButton" mnemonicParsing="false" text="Step" />
             <Button fx:id="resetMachineButton" mnemonicParsing="false" text="Reset" />
-            <Button mnemonicParsing="false" text="Button" />
         </buttons>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

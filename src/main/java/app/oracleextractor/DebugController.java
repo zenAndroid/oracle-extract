@@ -3,8 +3,6 @@ package app.oracleextractor;
 import app.oracleextractor.model.Machine;
 import app.oracleextractor.model.State;
 import app.oracleextractor.model.Transition;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -46,8 +44,6 @@ public class DebugController implements Initializable {
 
     Machine machineOfInterest; // The 'current' machine.
 
-    public enum ZOOM {IN, OUT, RESET}
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeUIElements();
@@ -62,6 +58,38 @@ public class DebugController implements Initializable {
         zoomOutButton.setOnAction(actionEvent -> zoomFunctionality(ZOOM.OUT)); // The lambda syntax is quite neat, ngl.
         zoomInButton.setOnAction(actionEvent -> zoomFunctionality(ZOOM.IN));
         zoomResetButton.setOnAction(actionEvent -> zoomFunctionality(ZOOM.RESET));
+
+        // Make sure the buttonBar is disabled at first.
+
+        buttonBar.setDisable(true);
+
+        // Give the 'Send Input' button its action handler
+
+        sndInputButton.setOnAction(actionEvent -> {
+            // Set the text as input.
+            var input = stringToList(sendingInputField.getText());
+            if (input.size() > 0) {
+                machineOfInterest.setInputSequence(input);
+                // Enable the button bar
+                buttonBar.setDisable(false);
+                updateUI();
+            }
+        });
+
+        stepMachineButton.setOnAction(actionEvent -> {
+            machineOfInterest.consumeToken();
+            updateUI();
+        });
+
+        runMachineButton.setOnAction(actionEvent -> {
+            machineOfInterest.consumeEntirely();
+            updateUI();
+        });
+
+        resetMachineButton.setOnAction(actionEvent -> {
+            // machineOfInterest = initialMachine;
+            updateUI();
+        });
     }
 
     /**
@@ -78,6 +106,9 @@ public class DebugController implements Initializable {
         return retVal;
     }
 
+    /**
+     * @return
+     */
     public Machine getDefaultMachine() {
 
         Machine debug = new Machine();
@@ -146,6 +177,9 @@ public class DebugController implements Initializable {
         return debug;
     }
 
+    /**
+     * @param argMachine
+     */
     public void updateMachineView(Machine argMachine) {
 
         try {
@@ -179,11 +213,27 @@ public class DebugController implements Initializable {
         }
     }
 
-    public void zoomFunctionality(ZOOM zoomDir){
-        switch (zoomDir){
-            case IN -> webView.setZoom(webView.getZoom()+0.1);
-            case OUT -> webView.setZoom(webView.getZoom()-0.1);
+    /**
+     *
+     */
+    public void updateUI() {
+        System.out.println("Updating UI");
+        lblInput.setText("Input : " + machineOfInterest.getInputAsString());
+        lblCurrentState.setText("Current State: " + machineOfInterest.getCurrentState().getName());
+        lblLastOutput.setText("Last Output: " + machineOfInterest.getLastOutput());
+        lblOutput.setText("Output accumulator: " + machineOfInterest.getProducedOutput());
+    }
+
+    /**
+     * @param zoomDir
+     */
+    public void zoomFunctionality(ZOOM zoomDir) {
+        switch (zoomDir) {
+            case IN -> webView.setZoom(webView.getZoom() + 0.1);
+            case OUT -> webView.setZoom(webView.getZoom() - 0.1);
             case RESET -> webView.setZoom(1.0);
         }
     }
+
+    public enum ZOOM {IN, OUT, RESET}
 }

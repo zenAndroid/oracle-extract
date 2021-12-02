@@ -30,6 +30,7 @@ public class Machine {
     ArrayList<Character> inputSequence;
     ArrayList<Character> producedOutput;
     ArrayList<Character> receivedOutput;
+    Character lastOutput;
     Set<Character> inputAlphabet;
     Set<Character> outputAlphabet;
     Boolean pendingInput;
@@ -283,6 +284,10 @@ public class Machine {
         this.pendingInput = pendingInput;
     }
 
+    public Character getLastOutput(){
+        return lastOutput;
+    }
+
     /**
      * Method to change the current state of the machine.
      *
@@ -346,13 +351,30 @@ public class Machine {
      * @return A string containing the entire output.
      */
     public String getProducedOutput() {
-        StringBuilder retVal = new StringBuilder(producedOutput.size());
-        for (Character ch : producedOutput) {
-            retVal.append(ch);
+        StringBuilder retVal = new StringBuilder();
+        try {
+            retVal = new StringBuilder(producedOutput.size());
+            for (Character ch : producedOutput) {
+                retVal.append(ch);
+            }
+        }
+        catch (NullPointerException exp){
+            retVal.append(" NO OUTPUT");
         }
         return retVal.toString();
     }
 
+    /**
+     * Method to get the input Sequence as a string.
+     * @return
+     */
+    public String getInputAsString() {
+        StringBuilder retVal = new StringBuilder(inputSequence.size());
+        for (Character ch : inputSequence) {
+            retVal.append(ch);
+        }
+        return retVal.toString();
+    }
     /**
      * Methods implementing the business logic that deals with incoming input.
      * Depending on the program/application being developed, the machine's reaction to a transition can change.
@@ -408,5 +430,14 @@ public class Machine {
             returnValue.addAll(state.getStateTransitions());
         }
         return returnValue;
+    }
+
+    public void consumeToken() {
+        // Todo: :|
+
+    }
+
+    public void consumeEntirely() {
+        // TODO :|
     }
 }

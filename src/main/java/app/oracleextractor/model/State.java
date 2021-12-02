@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Representing a state in the context of a Mealy Machine.
+ * Representing a state in the context of a Mealy Machine. <br />
  * A <code>State</code> has:
  * <ul>
  *     <li>A `name`.</li>
@@ -55,7 +55,7 @@ public class State {
 
     /**
      * Custom setter function that uses the var-arg syntax to allow easier transition creation/addition to the <code>State</code>.
-     * <br />
+     * <br /> <br />
      * <p>
      * Might remove the @NotNull annotation since it adds an unnecessary dependency though.
      *
@@ -86,11 +86,11 @@ public class State {
     }
 
     /**
-     * Method that triggers the state's consumption of the next input token.
-     * todo: make sure that this respects representation independence. (stateTransitions or by getter?)
+     * Method that triggers the state's consumption of the next input token.<br /> <br />
+     * todo: make sure that this respects representation independence. (stateTransitions or by getter?)<br />
      *  Will turn it into a getter function given that it will/should make it easier to change the implementation,
      *  although i am not too convinced by this argument, since it is very unlikely that stateTransitions are ever changed,
-     *  .... yeah actually i don't think i'll change this.
+     *  .... yeah actually i don't think i'll change this. <br />
      *  Also, This is the point you will need to change in order to handle non-determinism. MARK AS BOOKMARK
      */
     public void consumeInputToken() {
@@ -110,11 +110,29 @@ public class State {
     }
 
     /**
+     * Alternative way to run the machine. <br />
+     * Just testing a couple of things ...
+     */
+    public ArrayList<Transition> getApplicableTransitions(){
+        Character currTrigger = mach.getNextInputToken();
+
+        var applicableTransitions = new ArrayList<Transition>(); // Possible transitions from this state-trigger combo
+        for (Transition t : stateTransitions){ // For every transition this state has ...
+            if (t.isValid() && t.isTriggeredBy(currTrigger)){ // Check if the transition is valid && is the correct response to this character ...
+               // ... if so, add it to the list of possible transitions
+               applicableTransitions.add(t);
+            }
+        }
+        // At this stage we have the collection of transitions that can be taken from here on out, we return this for now
+        return applicableTransitions;
+    }
+
+    /**
      * Method used to change machine's current state.
      *
      * @param destinationState State to change to.
      */
-    private void changeMachineState(State destinationState) {
+    public void changeMachineState(State destinationState) {
         mach.changeState(destinationState);
         /*
          mach.currentState = destinationState; // I was actually surprised this works at first since
@@ -129,7 +147,7 @@ public class State {
      *
      * @param transitionOutput The output.
      */
-    private void emitOutput(Character transitionOutput) {
+    public void emitOutput(Character transitionOutput) {
         mach.processOutput(transitionOutput);
     }
 

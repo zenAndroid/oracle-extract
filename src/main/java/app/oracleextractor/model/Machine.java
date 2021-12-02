@@ -2,11 +2,12 @@ package app.oracleextractor.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 /**
  * Class represents a Mealy Machine, a kind of finite-state-machine.
- * The model used in this program is such that:
+ * The model used in this program is such that: <br />
  * A machine is a class that has:
  * <ul>
  *     <li>A set of states (Implemented as an Arraylist)</li>
@@ -31,12 +32,10 @@ public class Machine {
     State currentState;
     ArrayList<Character> inputSequence;
     ArrayList<Character> producedOutput;
-    ArrayList<Character> receivedInput;
     Character lastOutput;
     Set<Character> inputAlphabet;
     Set<Character> outputAlphabet;
     Boolean pendingInput;
-
 
     /**
      * Constructor for an object of the <code>Machine</code> class.
@@ -59,6 +58,7 @@ public class Machine {
         this.outputAlphabet = outputAlphabet;
         this.producedOutput = new ArrayList<>();
     }
+
 
     /**
      * Constructor for an object of the <code>Machine</code> class, when the input sequence isn't known at creation-time.
@@ -132,7 +132,7 @@ public class Machine {
         M.setInputAlphabet(Set.of('a', 'b'));
         M.setOutputAlphabet(Set.of('0', '1'));
         M.setStates(s0, s1, s2);
-        var ho=M.makeMachineCopy();
+        var ho = M.makeMachineCopy();
 
         var inputSeq = new ArrayList<Character>();
         inputSeq.add('a');
@@ -141,7 +141,7 @@ public class Machine {
         inputSeq.add('b');
         inputSeq.add('a');
 
-        M.consume(inputSeq);
+        M.nonDeterministicConsume(inputSeq);
 
         System.out.println("Second consumption");
 
@@ -182,7 +182,7 @@ public class Machine {
         // 7- Set the machine states
         MM.setStates(q1, q2, q3, q4);
         // 8- Set the input sequence. and consume
-        MM.consume(new ArrayList<>(List.of('a', 'b', 'b', 'a', 'b', 'b', 'b', 'a')));
+        MM.nonDeterministicConsume(new ArrayList<>(List.of('a', 'b', 'b', 'a', 'b', 'b', 'b', 'a')));
 
         // This should give
         // 0 0 0 1 1 1 1 1
@@ -327,23 +327,46 @@ public class Machine {
         return getPendingInput(); // Auto-boxing helps us out!
     }
 
-    /**
-     * Here goes, the starting point of the execution of the Mealy Machine. <br />
-     * It is passed an <code>ArrayList</code> of <code>Character</code>s of inputs, so steps are rather straight-forward:
-     * 1- Set the machine input sequence to this.
-     * 2- Notify the initial <code>State</code> so that it starts consuming the next input token.
-     * 3- Consumption of the <code>inputSequence</code> continues, until there ie none.
-     * In other words, while input exists, consume it.
-     *
-     * @param input The input fed to the machine.
-     * @author zenAndroid
-     */
-    public void consume(ArrayList<Character> input) {
+    public void nonDeterministicConsume(ArrayList<Character> input) {
         setInputSequence(input);
-        initialState.consumeInputToken();
         while (isPending()) {
-            currentState.consumeInputToken();
+            var possibleTransitions = currentState.getApplicableTransitions();
+            Transition actualTransition = chooseTransition(possibleTransitions);
+            takeTransition(actualTransition);
+
         }
+    }
+
+    public void nonDeterministicConsume() {
+        while (isPending()) {
+            var possibleTransitions = currentState.getApplicableTransitions();
+            Transition actualTransition = chooseTransition(possibleTransitions);
+            takeTransition(actualTransition);
+
+        }
+    }
+
+    public void nonDeterministicallyConsumeToken() {
+        if (isPending()) {
+            var possibleTransitions = currentState.getApplicableTransitions();
+            Transition actualTransition = chooseTransition(possibleTransitions);
+            takeTransition(actualTransition);
+
+        } else {
+            System.err.println("Cannot consume token: machine not pending");
+        }
+    }
+
+    /**
+     * To allow a <code>Transition</code> to be chosen, abstracted to its own method to allow for: <br />
+     * a) random selection, <i>and</i> b) interactive selection.
+     *
+     * @param possibleTransitions the list of <code>Transition</code>s
+     * @return the chosen <code>Transition</code>
+     */
+    private Transition chooseTransition(ArrayList<Transition> possibleTransitions) {
+        var randomStream = new Random();
+        return possibleTransitions.get(randomStream.nextInt(possibleTransitions.size()));
     }
 
     public void consumeToken() {
@@ -355,7 +378,7 @@ public class Machine {
     }
 
     public void consumeEntirely() {
-        consume(inputSequence);
+        nonDeterministicConsume(inputSequence);
     }
 
     /**
@@ -400,6 +423,21 @@ public class Machine {
             retVal.append(ch);
         }
         return retVal.toString();
+    }
+
+    /**
+     * Method to simulate taking this transition;
+     *
+     * @param transition The <code>Transition</code> that will be traversed by the machine.
+     */
+    public void takeTransition(Transition transition) {
+        if (transition.getSourceState().equals(getCurrentState())) {
+            transition.setTaken();
+            processOutput(transition.getTransitionOutput());
+            setCurrentState(transition.getDestinationState());
+        } else {
+            System.err.println("Transition not applicable: takeTransition " + transition);
+        }
     }
 
     /**

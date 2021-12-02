@@ -99,9 +99,11 @@ public class State {
         for (Transition tr : stateTransitions) { // For every transition,
             // We check that the transition is a) valid and b) compatible with this trigger.
             if (tr.isValid() && tr.isTriggeredBy(currTrigger)) {
-                // If so, then we a) emit the output marked by this transition;
+                // If so, then we a) mark the transition as having been visited,
+                tr.setTaken();
+                // b) emit the output marked by this transition;
                 emitOutput(tr.getTransitionOutput());
-                // b) change the machine's current state to the transition's destination State.
+                // c) change the machine's current state to the transition's destination State.
                 changeMachineState(tr.getDestinationState());
             }
         }

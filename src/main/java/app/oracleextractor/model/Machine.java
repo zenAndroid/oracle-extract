@@ -1,6 +1,9 @@
 package app.oracleextractor.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Class represents a Mealy Machine, a kind of finite-state-machine.
@@ -157,11 +160,6 @@ public class Machine {
         Transition t8 = new Transition('a', '2', s4, s3);
         Transition tnd9 = new Transition('a', '2', s4, s2); // Non-determinism test
 
-        s1.setStateTransitions(t1, t2, tnd2);
-        s2.setStateTransitions(t3, t4);
-        s3.setStateTransitions(t5, t6);
-        s4.setStateTransitions(t7, t8, tnd9);
-
         debug.setInitialState(s1);
 
         debug.setInputAlphabet(Set.of('a', 'b'));
@@ -169,6 +167,8 @@ public class Machine {
         debug.setOutputAlphabet(Set.of('1', '2'));
 
         debug.setStates(s1, s2, s3, s4);
+
+        debug.setMachineTransitions(t1, tnd2, t2, t3, t4, t5, t6, t7, t8, tnd9);
 
         return debug;
     }
@@ -368,9 +368,15 @@ public class Machine {
      */
     private Transition chooseTransition(ArrayList<Transition> possibleTransitions) {
         var randomStream = new Random();
-        if (possibleTransitions.size() == 1)
+        if (possibleTransitions.size() == 0) {
+            System.err.println("No transitions found from the current state, State:" + currentState.getName() + "possibleTransitions: " + possibleTransitions);
+        }
+        if (possibleTransitions.size() == 1){
             return possibleTransitions.get(0);
-        return possibleTransitions.get(randomStream.nextInt(possibleTransitions.size()));
+        }
+        else{
+            return possibleTransitions.get(randomStream.nextInt(possibleTransitions.size()));
+        }
         // Todo: Implement the transition chooser here!
     }
 
@@ -469,8 +475,8 @@ public class Machine {
         b.append("    INIT -> ").append(getInitialState().getName()).append(";\n");
         ArrayList<State> machineStates = getStates();
         for (State s : machineStates) {
-            var stateTranses = s.getStateTransitions();
-            for (Transition t : stateTranses) { // IF transition.visited() { append ("quelquechose syntax dot pour afficher le arrow en rouge") }
+            var stateTranses = getTransitionsFromState(s); // The transintions that come from this state.
+            for (Transition t : stateTranses) {
                 b.append("    ").append(s.getName()).append(" -> ").append(t.getDestinationState().getName()).append(" ");
                 b.append("[label=\"").append(t.getTransitionTrigger())
                         .append("/")
@@ -482,17 +488,15 @@ public class Machine {
         return b.append("}\n").toString();
     }
 
-    /**
-     * To get access to all of the transitions linked to the machine.
-     *
-     * @return <code>Transition</code>s of the machine.
-     */
-    public ArrayList<Transition> getAllTransitions() {
-        ArrayList<Transition> returnValue = new ArrayList<>();
-        for (State state : getStates()) {
-            returnValue.addAll(state.getStateTransitions());
+    private ArrayList<Transition> getTransitionsFromState(State s) {
+        ArrayList<Transition> transitions = new ArrayList<>();
+        for (Transition t : machineTransitions) {
+            if (t.getSourceState().equals(s)) {
+                // This transition comes from this state, so OK to add it
+                transitions.add(t);
+            }
         }
-        return returnValue;
+        return transitions;
     }
 
     /**
@@ -520,7 +524,7 @@ public class Machine {
         // states
 
         var newTransitions = new ArrayList<Transition>();
-        for (Transition t : getAllTransitions()) {
+        for (Transition t : machineTransitions) {
             newTransitions.add(new Transition(t.getTransitionTrigger(),
                     t.getTransitionOutput(),
                     getStateByName(newStates, t.getSourceState().getName()),
@@ -537,7 +541,6 @@ public class Machine {
                     newStateTransitions.add(t);
                 }
             }
-            s.setStateTransitions(newStateTransitions);
         }
         return retVal;
     }

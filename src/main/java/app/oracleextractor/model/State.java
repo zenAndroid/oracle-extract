@@ -81,74 +81,26 @@ public class State {
         return mach;
     }
 
-    public void setMach(Machine mach) {
-        this.mach = mach;
-    }
-
-    /**
-     * Method that triggers the state's consumption of the next input token.<br /> <br />
-     * todo: make sure that this respects representation independence. (stateTransitions or by getter?)<br />
-     *  Will turn it into a getter function given that it will/should make it easier to change the implementation,
-     *  although i am not too convinced by this argument, since it is very unlikely that stateTransitions are ever changed,
-     *  .... yeah actually i don't think i'll change this. <br />
-     *  Also, This is the point you will need to change in order to handle non-determinism. MARK AS BOOKMARK
-     */
-    public void consumeInputToken() {
-        Character currTrigger = mach.getNextInputToken();
-
-        for (Transition tr : stateTransitions) { // For every transition,
-            // We check that the transition is a) valid and b) compatible with this trigger.
-            if (tr.isValid() && tr.isTriggeredBy(currTrigger)) {
-                // If so, then we a) mark the transition as having been visited,
-                tr.setTaken();
-                // b) emit the output marked by this transition;
-                emitOutput(tr.getTransitionOutput());
-                // c) change the machine's current state to the transition's destination State.
-                changeMachineState(tr.getDestinationState());
-            }
-        }
+    public void setMach(Machine argMach) {
+        mach = argMach;
     }
 
     /**
      * Alternative way to run the machine. <br />
      * Just testing a couple of things ...
      */
-    public ArrayList<Transition> getApplicableTransitions(){
+    public ArrayList<Transition> getApplicableTransitions() {
         Character currTrigger = mach.getNextInputToken();
 
         var applicableTransitions = new ArrayList<Transition>(); // Possible transitions from this state-trigger combo
-        for (Transition t : stateTransitions){ // For every transition this state has ...
-            if (t.isValid() && t.isTriggeredBy(currTrigger)){ // Check if the transition is valid && is the correct response to this character ...
-               // ... if so, add it to the list of possible transitions
-               applicableTransitions.add(t);
+        for (Transition t : stateTransitions) { // For every transition this state has ...
+            if (t.isValid() && t.isTriggeredBy(currTrigger)) { // Check if the transition is valid && is the correct response to this character ...
+                // ... if so, add it to the list of possible transitions
+                applicableTransitions.add(t);
             }
         }
         // At this stage we have the collection of transitions that can be taken from here on out, we return this for now
         return applicableTransitions;
-    }
-
-    /**
-     * Method used to change machine's current state.
-     *
-     * @param destinationState State to change to.
-     */
-    public void changeMachineState(State destinationState) {
-        mach.changeState(destinationState);
-        /*
-         mach.currentState = destinationState; // I was actually surprised this works at first since
-         // we are accessing a class's field directly and the default initializer isn't public
-         // It turns out the default initializer is package-private, meaning classes defined in the same package can access the fields.
-         // Will change this though.
-        */
-    }
-
-    /**
-     * Method that allows a <code>State</code> to communicate a <code>Transition</code>'s output to its <code>Machine</code>.
-     *
-     * @param transitionOutput The output.
-     */
-    public void emitOutput(Character transitionOutput) {
-        mach.processOutput(transitionOutput);
     }
 
 }

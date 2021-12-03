@@ -58,7 +58,6 @@ public class Machine {
         this.producedOutput = new ArrayList<>();
     }
 
-
     /**
      * Constructor for an object of the <code>Machine</code> class, when the input sequence isn't known at creation-time.
      * <p>
@@ -98,7 +97,7 @@ public class Machine {
      * Temporary utility function to turn a string to an arraylist of characters.
      *
      * @param input Input <code>String</code>.
-     * @return <code>ArrayList<Character></code> representing the input.
+     * @return <code>ArrayList|Character|</code> representing the input.
      */
     public static ArrayList<Character> stringToList(String input) {
         var retVal = new ArrayList<Character>();
@@ -151,7 +150,6 @@ public class Machine {
 
         return debug;
     }
-
 
     public static void main(String[] args) {
         // Creating the states;
@@ -252,7 +250,7 @@ public class Machine {
     /**
      * Sets the <code>Machine</code>'s input sequence.
      *
-     * @param argInputSequence
+     * @param argInputSequence <code>Arraylist</code> representing the input.
      */
     public void setInputSequence(ArrayList<Character> argInputSequence) {
         inputSequence = argInputSequence;
@@ -345,18 +343,6 @@ public class Machine {
     private Transition chooseTransition(ArrayList<Transition> possibleTransitions) {
         var randomStream = new Random();
         return possibleTransitions.get(randomStream.nextInt(possibleTransitions.size()));
-    }
-
-    public void consumeToken() {
-        // Offload the drudgery upon the current state and tell it to change things depending on its output
-        // todo: might have to check this implementation out when trying to change to non-determinism
-        if (isPending())
-            currentState.consumeInputToken();
-
-    }
-
-    public void consumeEntirely() {
-        nonDeterministicConsume(inputSequence);
     }
 
     /**

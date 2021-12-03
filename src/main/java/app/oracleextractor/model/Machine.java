@@ -1,8 +1,6 @@
 package app.oracleextractor.model;
 
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Class represents a Mealy Machine, a kind of finite-state-machine.
@@ -35,6 +33,7 @@ public class Machine {
     Set<Character> inputAlphabet;
     Set<Character> outputAlphabet;
     Boolean pendingInput;
+    ArrayList<Transition> machineTransitions;
 
     /**
      * Constructor for an object of the <code>Machine</code> class.
@@ -55,6 +54,27 @@ public class Machine {
         this.pendingInput = true; // Just set up the input sequence, so obviously there IS pending input.
         this.inputAlphabet = inputAlphabet;
         this.outputAlphabet = outputAlphabet;
+        this.producedOutput = new ArrayList<>();
+        this.machineTransitions = new ArrayList<>();
+    }
+
+    /**
+     * <code>Machine</code> Constructor. <br />
+     *
+     * @param states             The <code>State</code>s that belong to this <code>Machine</code>.
+     * @param initialState       The initial <code>State</code>.
+     * @param inputAlphabet      The <code>Arraylist</code> of <code>Character</code>s representing the input alphabet.
+     * @param outputAlphabet     The <code>Arraylist</code> of <code>Character</code>s representing the output alphabet.
+     * @param machineTransitions The <code>Arraylist</code> of <code>Transition</code>s in this machine.
+     */
+    public Machine(ArrayList<State> states, State initialState, Set<Character> inputAlphabet, Set<Character> outputAlphabet, ArrayList<Transition> machineTransitions) {
+        this.states = states;
+        this.initialState = initialState;
+        this.currentState = initialState; // Notice that the current state is always initialized to the initial state.
+        this.inputAlphabet = inputAlphabet;
+        this.outputAlphabet = outputAlphabet;
+        this.machineTransitions = machineTransitions;
+        this.pendingInput = false;
         this.producedOutput = new ArrayList<>();
     }
 
@@ -77,6 +97,7 @@ public class Machine {
         this.inputSequence = new ArrayList<>(); // This is to avoid NullPointerExceptions
         this.pendingInput = false; /* Set to false because no inputSequence was passed in, so there is no input */
         this.producedOutput = new ArrayList<>();
+        this.machineTransitions = new ArrayList<>();
     }
 
     /**
@@ -91,6 +112,7 @@ public class Machine {
         inputAlphabet = Set.of();
         outputAlphabet = Set.of();
         producedOutput = new ArrayList<>();
+        this.machineTransitions = new ArrayList<>();
     }
 
     /**
@@ -285,13 +307,17 @@ public class Machine {
         return lastOutput;
     }
 
-    /**
-     * Method to change the current state of the machine.
-     *
-     * @param destState Next state to change into.
-     */
-    public void changeState(State destState) {
-        setCurrentState(destState);
+    public ArrayList<Transition> getMachineTransitions() {
+        return machineTransitions;
+    }
+
+    public void setMachineTransitions(ArrayList<Transition> transitions) {
+        machineTransitions = transitions;
+    }
+
+    public void setMachineTransitions(Transition... transitions) {
+        machineTransitions = new ArrayList<>(Arrays.asList(transitions));
+        // Boy this syntax is ... interesting ... i think i almost prefer the old natural way ...
     }
 
     /**
@@ -342,7 +368,10 @@ public class Machine {
      */
     private Transition chooseTransition(ArrayList<Transition> possibleTransitions) {
         var randomStream = new Random();
+        if (possibleTransitions.size() == 1)
+            return possibleTransitions.get(0);
         return possibleTransitions.get(randomStream.nextInt(possibleTransitions.size()));
+        // Todo: Implement the transition chooser here!
     }
 
     /**

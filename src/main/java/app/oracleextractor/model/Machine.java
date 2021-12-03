@@ -95,6 +95,20 @@ public class Machine {
     }
 
     /**
+     * Temporary utility function to turn a string to an arraylist of characters.
+     *
+     * @param input Input <code>String</code>.
+     * @return <code>ArrayList<Character></code> representing the input.
+     */
+    public static ArrayList<Character> stringToList(String input) {
+        var retVal = new ArrayList<Character>();
+        for (Character ch : input.toCharArray()) {
+            retVal.add(ch);
+        }
+        return retVal;
+    }
+
+    /**
      * @return A default machine, hardcoded and used for testing purposes.
      */
     public static Machine getDefaultMachine() {
@@ -143,11 +157,7 @@ public class Machine {
         // Creating the states;
         Machine sample = getDefaultMachine();
         System.out.println(sample.toDot());
-        var input = new ArrayList<Character>();
-        for (Character ch : "ba".toCharArray()) {
-            input.add(ch);
-        }
-        sample.nonDeterministicConsume(input);
+        sample.nonDeterministicConsume(stringToList("baabababba"));
     }
 
     /**
@@ -163,6 +173,9 @@ public class Machine {
             if (s.getName().equals(name)) {
                 retVal = s;
             }
+        }
+        if (retVal == null) {
+            System.err.println("State not found: getStateByName: " + name);
         }
         return retVal;
     }
@@ -181,13 +194,13 @@ public class Machine {
      * <br />
      * This setter then gives all the passed states the calling instantiated <code>Machine</code> as the 'owner' machine.
      *
-     * @param states Array of <code>State</code>s
+     * @param argStates Array of <code>State</code>s
      */
-    public void setStates(ArrayList<State> states) {
-        this.states = new ArrayList<>();
-        for (State s : states) { // These state do not have a machine as an owner, so we set it for them.
+    public void setStates(ArrayList<State> argStates) {
+        states = new ArrayList<>();
+        for (State s : argStates) { // These state do not have a machine as an owner, so we set it for them.
             s.setMach(this);
-            this.states.add(s);
+            states.add(s);
         }
         // TODO: Test this functionality!
         //  And I assume people that will come after me will (hopefully) make a proper testing suite.
@@ -198,14 +211,14 @@ public class Machine {
      * <br />
      * This setter then gives all the passed states the calling instantiated <code>Machine</code> as the 'owner' machine.
      *
-     * @param states Array of <code>State</code>s
+     * @param argStates Array of <code>State</code>s
      */
-    public void setStates(State... states) {
-        this.states = new ArrayList<>(); // Not sure this is even needed ... EDIT: It's crucial, let it be
+    public void setStates(State... argStates) {
+        states = new ArrayList<>(); // Not sure this is even needed ... EDIT: It's crucial, let it be
 
-        for (State s : states) {
+        for (State s : argStates) {
             s.setMach(this);
-            this.states.add(s);
+            states.add(s);
         }
     }
 
@@ -213,52 +226,61 @@ public class Machine {
         return initialState;
     }
 
-    public void setInitialState(State initialState) {
-        // This sets the initial state of the machine; it also sets the machine's current state;
-        initialState.mach = this;
-        this.initialState = initialState;
-        this.currentState = initialState;
+    /**
+     * This sets the initial state of the machine; it also sets the machine's current state;*
+     *
+     * @param argInitialState Argument <code>State</code>
+     */
+    public void setInitialState(State argInitialState) {
+        argInitialState.mach = this;
+        initialState = argInitialState;
+        currentState = argInitialState;
     }
 
     public State getCurrentState() {
         return currentState;
     }
 
-    public void setCurrentState(State currentState) {
-        this.currentState = currentState;
+    public void setCurrentState(State argState) {
+        currentState = argState;
     }
 
     public ArrayList<Character> getInputSequence() {
         return inputSequence;
     }
 
-    public void setInputSequence(ArrayList<Character> inputSequence) {
-        this.inputSequence = inputSequence;
-        this.pendingInput = true; // Input is now pending since we just set it!
+    /**
+     * Sets the <code>Machine</code>'s input sequence.
+     *
+     * @param argInputSequence
+     */
+    public void setInputSequence(ArrayList<Character> argInputSequence) {
+        inputSequence = argInputSequence;
+        pendingInput = true; // Input is now pending since we just set it!
     }
 
     public Set<Character> getInputAlphabet() {
         return inputAlphabet;
     }
 
-    public void setInputAlphabet(Set<Character> inputAlphabet) {
-        this.inputAlphabet = inputAlphabet;
+    public void setInputAlphabet(Set<Character> argInputAlphabet) {
+        inputAlphabet = argInputAlphabet;
     }
 
     public Set<Character> getOutputAlphabet() {
         return outputAlphabet;
     }
 
-    public void setOutputAlphabet(Set<Character> outputAlphabet) {
-        this.outputAlphabet = outputAlphabet;
+    public void setOutputAlphabet(Set<Character> argOutputAlphabet) {
+        outputAlphabet = argOutputAlphabet;
     }
 
     public Boolean getPendingInput() {
         return pendingInput;
     }
 
-    public void setPendingInput(Boolean pendingInput) {
-        this.pendingInput = pendingInput;
+    public void setPendingInput(Boolean argPendingInput) {
+        pendingInput = argPendingInput;
     }
 
     public Character getLastOutput() {
@@ -279,8 +301,8 @@ public class Machine {
      *
      * @return the boolean value that represents the availability of input.
      */
-    public boolean isPending() {
-        return getPendingInput(); // Auto-boxing helps us out!
+    public Boolean isPending() {
+        return getPendingInput();
     }
 
     public void nonDeterministicConsume(ArrayList<Character> input) {

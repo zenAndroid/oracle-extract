@@ -58,16 +58,8 @@ public class Transition {
         return transitionTrigger;
     }
 
-    public void setTransitionTrigger(Character transitionTrigger) {
-        this.transitionTrigger = transitionTrigger;
-    }
-
     public Character getTransitionOutput() {
         return transitionOutput;
-    }
-
-    public void setTransitionOutput(Character transitionOutput) {
-        this.transitionOutput = transitionOutput;
     }
 
     public Boolean getTransitionValid() {
@@ -82,16 +74,8 @@ public class Transition {
         return destinationState;
     }
 
-    public void setDestinationState(State destinationState) {
-        this.destinationState = destinationState;
-    }
-
     public State getSourceState() {
         return sourceState;
-    }
-
-    public void setSourceState(State sourceState) {
-        this.sourceState = sourceState;
     }
 
     /**

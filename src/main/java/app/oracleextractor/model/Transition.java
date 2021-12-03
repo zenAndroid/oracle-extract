@@ -22,39 +22,11 @@ package app.oracleextractor.model;
 public class Transition {
     Character transitionTrigger;
     Character transitionOutput;
-    Boolean transitionValid;
     State sourceState;
     State destinationState;
     Boolean wasVisited;
+    Boolean transitionValid;
 
-    /**
-     * <code>Transition</code> constructor, takes the trigger and the output resulting from this transition.
-     *
-     * @param transitionTrigger Input token that triggers the transition.
-     * @param transitionOutput  Output emitted when this transition takes place.
-     */
-    public Transition(Character transitionTrigger, Character transitionOutput) {
-        commonInit();
-        this.transitionTrigger = transitionTrigger;
-        this.transitionOutput = transitionOutput;
-        sourceState = new State();
-        destinationState = new State();
-    }
-
-    /**
-     * <code>Transition</code> constructor, take the trigger, the output, and the destination <code>State</code>
-     *
-     * @param transitionTrigger Input token that triggers the transition.
-     * @param transitionOutput  Output emitted when this transition takes place.
-     * @param destinationState  The resulting <code>State</code> after this <code>Transition</code>.
-     */
-    public Transition(Character transitionTrigger, Character transitionOutput, State destinationState) {
-        commonInit();
-        this.transitionTrigger = transitionTrigger;
-        this.transitionOutput = transitionOutput;
-        sourceState = new State();
-        this.destinationState = destinationState;
-    }
 
     /**
      * <code>Transition</code> constructor that accepts also the <code>sourceState</code> to hold a reference to the source state;
@@ -140,9 +112,10 @@ public class Transition {
 
     /**
      * Getter for the visited flag;
+     *
      * @return <code>wasVisited</code>
      */
-    public Boolean wasTaken(){
+    public Boolean wasTaken() {
         return wasVisited;
     }
 

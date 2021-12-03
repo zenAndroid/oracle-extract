@@ -1,16 +1,12 @@
 package app.oracleextractor;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ResourceBundle;
-import java.util.Scanner;
 import java.util.Set;
 
 import javafx.fxml.FXML;
@@ -118,7 +114,7 @@ public class MainController implements Initializable {
              */
             BufferedReader reader = new BufferedReader(new InputStreamReader(pb.start().getInputStream()));
             StringBuilder builder = new StringBuilder();
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 builder.append(line);
                 builder.append(System.getProperty("line.separator"));

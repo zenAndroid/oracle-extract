@@ -15,7 +15,7 @@ public class DebugUI extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         try {
             Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("MealyDbgUI.fxml")));
             Scene scene = new Scene(root);

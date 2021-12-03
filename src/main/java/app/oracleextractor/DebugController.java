@@ -16,19 +16,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class DebugController implements Initializable {
     @FXML
     TextArea execLogTextArea;
+
     @FXML
     Text lblInput, lblCurrentState, lblLastOutput, lblOutput;
 
     @FXML
     WebView webView;
-
-    WebEngine engine;
 
     @FXML
     Button zoomOutButton, zoomResetButton, zoomInButton, sndInputButton, runMachineButton, stepMachineButton, resetMachineButton;
@@ -42,13 +40,14 @@ public class DebugController implements Initializable {
     Machine machineOfInterest, // The 'current' machine.
             cloneOfInterest; // The clone of the main machine that is being debugged.
 
+    WebEngine engine;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeUIElements();
         machineOfInterest = Machine.getDefaultMachine();
         cloneOfInterest = machineOfInterest.makeMachineCopy();
         updateMachineView(machineOfInterest);
-        // 1 2 2 2 2 1
     }
 
     public void initializeUIElements() {
@@ -66,7 +65,7 @@ public class DebugController implements Initializable {
 
         sndInputButton.setOnAction(actionEvent -> {
             // Set the text as input.
-            var input = stringToList(sendingInputField.getText());
+            var input = Machine.stringToList(sendingInputField.getText());
             sendingInputField.setText(""); // Empty the input field.
             if (input.size() > 0) {
                 machineOfInterest.setInputSequence(input);
@@ -93,21 +92,6 @@ public class DebugController implements Initializable {
     }
 
     /**
-     * Returns an Arraylist of Chars from a string
-     *
-     * @param argString The argument string
-     * @return the array
-     */
-    public ArrayList<Character> stringToList(String argString) {
-        var retVal = new ArrayList<Character>();
-        for (Character chara : argString.toCharArray()) {
-            retVal.add(chara);
-        }
-        return retVal;
-    }
-
-
-    /**
      * @param argMachine The machine that will be displayed on the webView.
      */
     public void updateMachineView(Machine argMachine) {
@@ -123,10 +107,6 @@ public class DebugController implements Initializable {
 
         try {
             ProcessBuilder pb = new ProcessBuilder("dot.exe", "input.dot", "-Tsvg");
-            /*
-             * File foo = new File("automaton.svg"); fooPath = Path.of(foo.getPath());
-             * pb.redirectOutput(foo);
-             */
             BufferedReader reader = new BufferedReader(new InputStreamReader(pb.start().getInputStream()));
             StringBuilder builder = new StringBuilder();
             String line;
@@ -144,7 +124,7 @@ public class DebugController implements Initializable {
     }
 
     /**
-     *
+     * Updates the labels above the <code>Machine</code>'s view, as well as the <code>Machine</code> view itself.
      */
     public void updateUI() {
         lblInput.setText("Input : " + machineOfInterest.getInputAsString());

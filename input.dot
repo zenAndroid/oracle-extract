@@ -1,10 +1,10 @@
 digraph Automaton {
     node [shape=point] INIT;
-    q1 [shape="doublecircle"];
+    q2 [shape="doublecircle"];
     node [shape=circle];
     rankdir = LR;
     INIT -> q1;
-    q1 -> q2 [label="b/2"];
+    q1 -> q2 [label="b/2", color=red];
     q1 -> q4 [label="b/8"];
     q1 -> q4 [label="a/1"];
     q2 -> q1 [label="a/3"];

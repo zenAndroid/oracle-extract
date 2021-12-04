@@ -129,7 +129,9 @@ public class DebugController implements Initializable {
     public void updateUI() {
         lblInput.setText("Input : " + machineOfInterest.getInputAsString());
         lblCurrentState.setText("Current State: " + machineOfInterest.getCurrentState().getName());
-        lblLastOutput.setText("Last Output: " + machineOfInterest.getLastOutput());
+        if (machineOfInterest.getLastOutput() != null) {
+           lblLastOutput.setText("Last Output: " + machineOfInterest.getLastOutput());
+        }
         lblOutput.setText("Output accumulator: " + machineOfInterest.getProducedOutput());
         updateMachineView(machineOfInterest);
     }

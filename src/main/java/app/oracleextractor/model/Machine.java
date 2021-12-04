@@ -331,12 +331,7 @@ public class Machine {
 
     public void nonDeterministicConsume(ArrayList<Character> input) {
         setInputSequence(input);
-        while (isPending()) {
-            var possibleTransitions = currentState.getApplicableTransitions();
-            Transition actualTransition = chooseTransition(possibleTransitions);
-            takeTransition(actualTransition);
-
-        }
+        nonDeterministicConsume(); // Embarrassing deduplication of logic ...
     }
 
     public void nonDeterministicConsume() {
@@ -344,7 +339,6 @@ public class Machine {
             var possibleTransitions = currentState.getApplicableTransitions();
             Transition actualTransition = chooseTransition(possibleTransitions);
             takeTransition(actualTransition);
-
         }
     }
 
@@ -531,17 +525,24 @@ public class Machine {
                     getStateByName(newStates, t.getDestinationState().getName())));
         } // Transitions added, now comes the dicey part ...adding the correct transitions to the correct states ...
 
-        for (State s : retVal.getStates()) {
-            // For every state of this new machine, we have to add to it the transition that come from it
-            var newStateTransitions = new ArrayList<Transition>();
-            // We go through the transitions and see the ones
-            // that have the same states this one on the sourceState field ...
-            for (Transition t : newTransitions) {
-                if (t.getSourceState().getName().equals(s.getName())) {
-                    newStateTransitions.add(t);
-                }
-            }
-        }
+        retVal.setMachineTransitions(newTransitions);
+        System.err.println(retVal);
         return retVal;
+    }
+
+    @Override
+    public String toString() {
+        return "Machine{" +
+                "states=" + states +
+                ", initialState=" + initialState +
+                ", currentState=" + currentState +
+                ", inputSequence=" + inputSequence +
+                ", producedOutput=" + producedOutput +
+                ", lastOutput=" + lastOutput +
+                ", inputAlphabet=" + inputAlphabet +
+                ", outputAlphabet=" + outputAlphabet +
+                ", pendingInput=" + pendingInput + '\n' +
+                ", machineTransitions=" + machineTransitions +
+                '}';
     }
 }

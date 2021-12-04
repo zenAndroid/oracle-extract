@@ -341,7 +341,7 @@ public class Machine {
             takeTransition(actualTransition);
         }
     }
-
+glkjdflgjlkdsjg;lkdsfjg;lkfdjg;lsdkfjg;ldkfjgs;lfdkjg;lfdkjg
     public void nonDeterministicallyConsumeToken() {
         if (isPending()) {
             var possibleTransitions = currentState.getApplicableTransitions();

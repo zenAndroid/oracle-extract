@@ -24,7 +24,7 @@
       </MenuBar>
       <VBox prefHeight="74.0" prefWidth="600.0" spacing="5.0" VBox.vgrow="NEVER">
          <children>
-            <Text fx:id="lblInput" strokeType="OUTSIDE" strokeWidth="0.0" text="Input: NONE" />
+            <Text fx:id="lblInput" strokeType="OUTSIDE" strokeWidth="0.0" text="Current Input: NONE" />
             <Text fx:id="lblCurrentState" strokeType="OUTSIDE" strokeWidth="0.0" text="Current State: NONE" />
             <Text fx:id="lblLastOutput" strokeType="OUTSIDE" strokeWidth="0.0" text="Last Output: NONE" />
             <Text fx:id="lblOutput" strokeType="OUTSIDE" strokeWidth="0.0" text="Output accumulator: NONE" />

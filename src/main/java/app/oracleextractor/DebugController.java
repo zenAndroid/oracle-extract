@@ -1,6 +1,8 @@
 package app.oracleextractor;
 
 import app.oracleextractor.model.Machine;
+import app.oracleextractor.model.exceptions.NoPendingInput;
+import app.oracleextractor.model.utils.Utilities;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -45,7 +47,7 @@ public class DebugController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeUIElements();
-        machineOfInterest = Machine.getDefaultMachine();
+        machineOfInterest = Utilities.getDefaultMachine();
         cloneOfInterest = machineOfInterest.makeMachineCopy();
         updateMachineView(machineOfInterest);
     }
@@ -65,7 +67,7 @@ public class DebugController implements Initializable {
 
         sndInputButton.setOnAction(actionEvent -> {
             // Set the text as input.
-            var input = Machine.stringToList(sendingInputField.getText());
+            var input = Utilities.stringToList(sendingInputField.getText());
             sendingInputField.setText(""); // Empty the input field.
             if (input.size() > 0) {
                 machineOfInterest.setInputSequence(input);
@@ -77,7 +79,11 @@ public class DebugController implements Initializable {
         });
 
         stepMachineButton.setOnAction(actionEvent -> {
-            machineOfInterest.nonDeterministicallyConsumeToken();
+            try {
+                machineOfInterest.nonDeterministicallyConsumeToken();
+            } catch (NoPendingInput e) {
+                e.printStackTrace();
+            }
             log(LOGTYPE.STEP_ENTRY);
             updateUI();
         });

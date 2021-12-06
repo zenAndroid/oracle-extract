@@ -1,5 +1,11 @@
 package app.oracleextractor.model;
 
+import app.oracleextractor.model.exceptions.NoPendingInput;
+import app.oracleextractor.model.exceptions.NoTransitionFound;
+import app.oracleextractor.model.exceptions.StateNotFound;
+import app.oracleextractor.model.exceptions.TransitionNotApplicable;
+import app.oracleextractor.model.utils.Utilities;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -130,86 +136,12 @@ public class Machine {
      * TODO: Create a function that separately initializes all of the ad-hoc member variable, instead of duplicating code/work.
      */
 
-    /**
-     * Temporary utility function to turn a string to an arraylist of characters.
-     *
-     * @param input Input <code>String</code>.
-     * @return <code>ArrayList|Character|</code> representing the input.
-     */
-    public static ArrayList<Character> stringToList(String input) {
-        var retVal = new ArrayList<Character>();
-        for (Character ch : input.toCharArray()) {
-            retVal.add(ch);
-        }
-        return retVal;
-    }
-
-    /**
-     * @return A default machine, hardcoded and used for testing purposes.
-     */
-    public static Machine getDefaultMachine() {
-
-        Machine debug = new Machine();
-
-        /*
-        The state are created, with their uniques names;
-         */
-        State s1 = new State();
-        State s2 = new State();
-        State s3 = new State();
-        State s4 = new State();
-        /*
-        The transitions are created with their trigger, output, source states and destination states.
-         */
-        Transition t1 = new Transition('b', '2', s1, s2);
-        Transition tnd2 = new Transition('b', '8', s1, s4);
-        Transition t2 = new Transition('a', '1', s1, s4);
-        Transition t3 = new Transition('a', '3', s2, s1);
-        Transition t4 = new Transition('b', '2', s2, s3);
-        Transition t5 = new Transition('a', '1', s3, s2);
-        Transition t6 = new Transition('b', '2', s3, s1);
-        Transition t7 = new Transition('b', '1', s4, s1);
-        Transition t8 = new Transition('a', '2', s4, s3);
-        Transition tnd9 = new Transition('a', '2', s4, s2); // Non-determinism test
-
-        debug.setInitialState(s1);
-
-        debug.setInputAlphabet(Set.of('a', 'b'));
-
-        debug.setOutputAlphabet(Set.of('1', '2'));
-
-        debug.setStates(s1, s2, s3, s4);
-
-        debug.setMachineTransitions(t1, tnd2, t2, t3, t4, t5, t6, t7, t8, tnd9);
-
-        return debug;
-    }
 
     public static void main(String[] args) {
         // Creating the states;
-        Machine sample = getDefaultMachine();
+        Machine sample = Utilities.getDefaultMachine();
         System.out.println(sample.toDot());
-        sample.nonDeterministicConsume(stringToList("baabababba"));
-    }
-
-    /**
-     * Method for getting a state given its name and and array of states.
-     *
-     * @param newStates The array of <code>State</code>s to be looked through.
-     * @param name      The name of the <code>State</code>.
-     * @return The targeted <code>State</code>.
-     */
-    private static State getStateByName(ArrayList<State> newStates, String name) {
-        State retVal = null;
-        for (State s : newStates) {
-            if (s.getName().equals(name)) {
-                retVal = s;
-            }
-        }
-        if (retVal == null) {
-            System.err.println("State not found: getStateByName: " + name);
-        }
-        return retVal;
+        sample.nonDeterministicConsume(Utilities.stringToList("baabababba"));
     }
 
     public Trace getMachineTrace() {
@@ -358,19 +290,30 @@ public class Machine {
         machineTrace.clear(); // Clear the trace.
         while (isPending()) {
             ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions();
-            Transition actualTransition = chooseTransition(possibleTransitions);
-            takeTransition(actualTransition);
+            Transition actualTransition;
+            try {
+                actualTransition = chooseTransition(possibleTransitions);
+                takeTransition(actualTransition);
+            } catch (NoTransitionFound | TransitionNotApplicable e) {
+                // TODO: Is there something else todo here?
+                e.printStackTrace();
+            }
         }
     }
 
-    public void nonDeterministicallyConsumeToken() {
+    public void nonDeterministicallyConsumeToken() throws NoPendingInput {
         if (isPending()) {
             ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions();
-            Transition actualTransition = chooseTransition(possibleTransitions);
-            takeTransition(actualTransition);
-
+            Transition actualTransition;
+            try {
+                actualTransition = chooseTransition(possibleTransitions);
+                takeTransition(actualTransition);
+            } catch (NoTransitionFound | TransitionNotApplicable e) {
+                // TODO: Is there something else todo here?
+                e.printStackTrace();
+            }
         } else {
-            System.err.println("Cannot consume token: machine not pending");
+            throw new NoPendingInput("Cannot consume token: machine not pending");
         }
     }
 
@@ -381,12 +324,11 @@ public class Machine {
      * @param possibleTransitions the list of <code>Transition</code>s
      * @return the chosen <code>Transition</code>
      */
-    private Transition chooseTransition(ArrayList<Transition> possibleTransitions) {
+    private Transition chooseTransition(ArrayList<Transition> possibleTransitions) throws NoTransitionFound {
         var randomStream = new Random();
-        if (possibleTransitions.size() == 0) {
-            System.err.println("No transitions found from the current state, State:" + currentState.getName() + "possibleTransitions: " + possibleTransitions);
-        }
-        if (possibleTransitions.size() == 1) {
+        if (possibleTransitions.isEmpty()) {
+            throw new NoTransitionFound("No transitions found from the current state, State:" + currentState.getName() + "possibleTransitions: " + possibleTransitions);
+        } else if (possibleTransitions.size() == 1) {
             return possibleTransitions.get(0);
         } else {
             return possibleTransitions.get(randomStream.nextInt(possibleTransitions.size()));
@@ -443,7 +385,7 @@ public class Machine {
      *
      * @param transition The <code>Transition</code> that will be traversed by the machine.
      */
-    public void takeTransition(Transition transition) {
+    public void takeTransition(Transition transition) throws TransitionNotApplicable {
         if (transition.getSourceState().equals(getCurrentState())) {
             StateTransition newST = new StateTransition(currentState, transition.getDestinationState(), transition);
             machineTrace.addSTransition(newST);
@@ -451,7 +393,7 @@ public class Machine {
             processOutput(transition.getTransitionOutput());
             setCurrentState(transition.getDestinationState());
         } else {
-            System.err.println("Transition not applicable: takeTransition " + transition);
+            throw new TransitionNotApplicable("Transition not applicable from this state. arg: " + transition);
         }
     }
 
@@ -533,7 +475,12 @@ public class Machine {
         }
         retVal.setStates(newStates); // Setting the new States in the new machine.
         // Setting the new machine's initial state.
-        retVal.setInitialState(getStateByName(newStates, getInitialState().getName()));
+        try {
+            retVal.setInitialState(Utilities.getStateByName(newStates, getInitialState().getName()));
+        } catch (StateNotFound e) {
+            // TODO: Is there something else todo here?
+            e.printStackTrace();
+        }
 
         // Now we will create the transitions, this might get hairy, but i will try to
         // compactify the operations by making use of the constructors that allow me to set the source and destinaton
@@ -541,14 +488,18 @@ public class Machine {
 
         var newTransitions = new ArrayList<Transition>();
         for (Transition t : machineTransitions) {
-            newTransitions.add(new Transition(t.getTransitionTrigger(),
-                    t.getTransitionOutput(),
-                    getStateByName(newStates, t.getSourceState().getName()),
-                    getStateByName(newStates, t.getDestinationState().getName())));
+            try {
+                newTransitions.add(new Transition(t.getTransitionTrigger(),
+                        t.getTransitionOutput(),
+                        Utilities.getStateByName(newStates, t.getSourceState().getName()),
+                        Utilities.getStateByName(newStates, t.getDestinationState().getName())));
+            } catch (StateNotFound e) {
+                // Todo: some thing to do?
+                e.printStackTrace();
+            }
         } // Transitions added, now comes the dicey part ...adding the correct transitions to the correct states ...
 
         retVal.setMachineTransitions(newTransitions);
-        System.err.println(retVal);
         return retVal;
     }
 

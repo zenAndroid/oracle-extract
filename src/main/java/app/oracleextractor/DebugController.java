@@ -71,24 +71,40 @@ public class DebugController implements Initializable {
                 machineOfInterest.setInputSequence(input);
                 // Enable the button bar
                 buttonBar.setDisable(false);
+                log(LOGTYPE.NEW_INPUT_ENTRY); // Log the new input
                 updateUI();
             }
         });
 
         stepMachineButton.setOnAction(actionEvent -> {
             machineOfInterest.nonDeterministicallyConsumeToken();
+            log(LOGTYPE.STEP_ENTRY);
             updateUI();
         });
 
         runMachineButton.setOnAction(actionEvent -> {
             machineOfInterest.nonDeterministicConsume();
+            log(LOGTYPE.RUN_ENTRY);
             updateUI();
         });
 
         resetMachineButton.setOnAction(actionEvent -> {
             machineOfInterest = cloneOfInterest.makeMachineCopy();
+            log(LOGTYPE.RESET_MACHINE_ENTRY);
             updateUI();
         });
+    }
+
+    public void log(LOGTYPE type) {
+        String existingContent = execLogTextArea.getText();
+        String newContent = "";
+        switch (type) {
+            case NEW_INPUT_ENTRY -> newContent = "New input to the machine: " + machineOfInterest.getInputAsString() + '\n';
+            case STEP_ENTRY -> newContent = machineOfInterest.getMachineTrace().getLastChange().toString() + '\n';
+            case RUN_ENTRY -> newContent = "Complete machine execution.\n" + machineOfInterest.getMachineTrace().toString() + '\n';
+            case RESET_MACHINE_ENTRY -> newContent = "Machine reset to initial state.\n";
+        }
+        execLogTextArea.setText(existingContent + newContent);
     }
 
     /**
@@ -130,7 +146,7 @@ public class DebugController implements Initializable {
         lblInput.setText("Input : " + machineOfInterest.getInputAsString());
         lblCurrentState.setText("Current State: " + machineOfInterest.getCurrentState().getName());
         if (machineOfInterest.getLastOutput() != null) {
-           lblLastOutput.setText("Last Output: " + machineOfInterest.getLastOutput());
+            lblLastOutput.setText("Last Output: " + machineOfInterest.getLastOutput());
         }
         lblOutput.setText("Output accumulator: " + machineOfInterest.getProducedOutput());
         updateMachineView(machineOfInterest);
@@ -148,4 +164,12 @@ public class DebugController implements Initializable {
     }
 
     public enum ZOOM {IN, OUT, RESET}
+
+    public enum LOGTYPE {
+        NEW_INPUT_ENTRY,
+        STEP_ENTRY,
+        RUN_ENTRY,
+        RESET_MACHINE_ENTRY,
+
+    }
 }

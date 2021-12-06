@@ -22,11 +22,13 @@ import java.util.Set;
  *          </ul>
  *     </li>
  *     <li><code>pendingInput</code>, a boolean flag representing whether there is still input.</li>
+ *     <li><code>Trace</code>, a data structure that holds all of the <code>StateTransition</code>s that have occured</li>
  * </ul>
  *
  * @author zenAndroid
  */
 public class Machine {
+
     ArrayList<State> states;
     State initialState;
     State currentState;
@@ -37,11 +39,13 @@ public class Machine {
     Set<Character> outputAlphabet;
     Boolean pendingInput;
     ArrayList<Transition> machineTransitions;
+    Trace machineTrace;
 
     /**
      * Constructor for an object of the <code>Machine</code> class.
      * <br />
-     * Note that this constructor sets the <code>pendingInput</code> flag to true, since the input sequence is passed in as an argument to this constructor.
+     * Note that this constructor sets the <code>pendingInput</code> flag to true, since the input sequence is passed in as an argument to this constructor. <br />
+     * This also initializes the necessary member variables.
      *
      * @param states         The states.
      * @param initialState   The initial state of this machine.
@@ -59,10 +63,11 @@ public class Machine {
         this.outputAlphabet = outputAlphabet;
         this.producedOutput = new ArrayList<>();
         this.machineTransitions = new ArrayList<>();
+        this.machineTrace = new Trace();
     }
 
     /**
-     * <code>Machine</code> Constructor. <br />
+     * <code>Machine</code> Constructor. <br /> This also initializes the necessary member variables.
      *
      * @param states             The <code>State</code>s that belong to this <code>Machine</code>.
      * @param initialState       The initial <code>State</code>.
@@ -79,6 +84,7 @@ public class Machine {
         this.machineTransitions = machineTransitions;
         this.pendingInput = false;
         this.producedOutput = new ArrayList<>();
+        this.machineTrace = new Trace();
     }
 
     /**
@@ -101,6 +107,7 @@ public class Machine {
         this.pendingInput = false; /* Set to false because no inputSequence was passed in, so there is no input */
         this.producedOutput = new ArrayList<>();
         this.machineTransitions = new ArrayList<>();
+        this.machineTrace = new Trace();
     }
 
     /**
@@ -116,7 +123,12 @@ public class Machine {
         outputAlphabet = Set.of();
         producedOutput = new ArrayList<>();
         this.machineTransitions = new ArrayList<>();
+        this.machineTrace = new Trace();
     }
+
+    /*
+     * TODO: Create a function that separately initializes all of the ad-hoc member variable, instead of duplicating code/work.
+     */
 
     /**
      * Temporary utility function to turn a string to an arraylist of characters.
@@ -198,6 +210,14 @@ public class Machine {
             System.err.println("State not found: getStateByName: " + name);
         }
         return retVal;
+    }
+
+    public Trace getMachineTrace() {
+        return machineTrace;
+    }
+
+    public void setMachineTrace(Trace machineTrace) {
+        this.machineTrace = machineTrace;
     }
 
     /**
@@ -331,26 +351,21 @@ public class Machine {
 
     public void nonDeterministicConsume(ArrayList<Character> input) {
         setInputSequence(input);
-        while (isPending()) {
-            var possibleTransitions = currentState.getApplicableTransitions();
-            Transition actualTransition = chooseTransition(possibleTransitions);
-            takeTransition(actualTransition);
-
-        }
+        nonDeterministicConsume();
     }
 
     public void nonDeterministicConsume() {
+        machineTrace.clear(); // Clear the trace.
         while (isPending()) {
-            var possibleTransitions = currentState.getApplicableTransitions();
+            ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions();
             Transition actualTransition = chooseTransition(possibleTransitions);
             takeTransition(actualTransition);
-
         }
     }
 
     public void nonDeterministicallyConsumeToken() {
         if (isPending()) {
-            var possibleTransitions = currentState.getApplicableTransitions();
+            ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions();
             Transition actualTransition = chooseTransition(possibleTransitions);
             takeTransition(actualTransition);
 
@@ -371,10 +386,9 @@ public class Machine {
         if (possibleTransitions.size() == 0) {
             System.err.println("No transitions found from the current state, State:" + currentState.getName() + "possibleTransitions: " + possibleTransitions);
         }
-        if (possibleTransitions.size() == 1){
+        if (possibleTransitions.size() == 1) {
             return possibleTransitions.get(0);
-        }
-        else{
+        } else {
             return possibleTransitions.get(randomStream.nextInt(possibleTransitions.size()));
         }
         // Todo: Implement the transition chooser here!
@@ -425,12 +439,14 @@ public class Machine {
     }
 
     /**
-     * Method to simulate taking this transition;
+     * Method to simulate taking this transition; also adds the transition to the running machine's trace.
      *
      * @param transition The <code>Transition</code> that will be traversed by the machine.
      */
     public void takeTransition(Transition transition) {
         if (transition.getSourceState().equals(getCurrentState())) {
+            StateTransition newST = new StateTransition(currentState, transition.getDestinationState(), transition);
+            machineTrace.addSTransition(newST);
             transition.setTaken();
             processOutput(transition.getTransitionOutput());
             setCurrentState(transition.getDestinationState());

@@ -81,11 +81,13 @@ public class DebugController implements Initializable {
         stepMachineButton.setOnAction(actionEvent -> {
             try {
                 machineOfInterest.nonDeterministicallyConsumeToken();
+                log(LOGTYPE.STEP_ENTRY);
+                updateUI();
             } catch (NoPendingInput e) {
                 e.printStackTrace();
+                Utilities.getPopup("No tokens left","There are no tokens left to consume").showAndWait();
             }
-            log(LOGTYPE.STEP_ENTRY);
-            updateUI();
+
         });
 
         runMachineButton.setOnAction(actionEvent -> {

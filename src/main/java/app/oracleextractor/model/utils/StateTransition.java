@@ -1,4 +1,7 @@
-package app.oracleextractor.model;
+package app.oracleextractor.model.utils;
+
+import app.oracleextractor.model.State;
+import app.oracleextractor.model.Transition;
 
 public class StateTransition {
 

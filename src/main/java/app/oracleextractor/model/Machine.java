@@ -4,6 +4,8 @@ import app.oracleextractor.model.exceptions.NoPendingInput;
 import app.oracleextractor.model.exceptions.NoTransitionFound;
 import app.oracleextractor.model.exceptions.StateNotFound;
 import app.oracleextractor.model.exceptions.TransitionNotApplicable;
+import app.oracleextractor.model.utils.StateTransition;
+import app.oracleextractor.model.utils.Trace;
 import app.oracleextractor.model.utils.Utilities;
 
 import java.util.ArrayList;
@@ -35,17 +37,17 @@ import java.util.Set;
  */
 public class Machine {
 
-    ArrayList<State> states;
-    State initialState;
-    State currentState;
-    ArrayList<Character> inputSequence;
-    ArrayList<Character> producedOutput;
-    Character lastOutput;
-    Set<Character> inputAlphabet;
-    Set<Character> outputAlphabet;
-    Boolean pendingInput;
-    ArrayList<Transition> machineTransitions;
-    Trace machineTrace;
+    private ArrayList<State> states;
+    private State initialState;
+    private State currentState;
+    private ArrayList<Character> inputSequence;
+    private ArrayList<Character> producedOutput;
+    private Character lastOutput;
+    private Set<Character> inputAlphabet;
+    private Set<Character> outputAlphabet;
+    private Boolean pendingInput;
+    private ArrayList<Transition> machineTransitions;
+    private Trace machineTrace;
 
     /**
      * Constructor for an object of the <code>Machine</code> class.
@@ -187,7 +189,6 @@ public class Machine {
      */
     public void setStates(State... argStates) {
         states = new ArrayList<>(); // Not sure this is even needed ... EDIT: It's crucial, let it be
-
         for (State s : argStates) {
             s.setMach(this);
             states.add(s);

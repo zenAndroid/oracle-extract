@@ -1,4 +1,8 @@
-package app.oracleextractor.model;
+package app.oracleextractor.model.utils;
+
+import app.oracleextractor.model.State;
+import app.oracleextractor.model.Transition;
+import app.oracleextractor.model.utils.StateTransition;
 
 import java.util.ArrayList;
 

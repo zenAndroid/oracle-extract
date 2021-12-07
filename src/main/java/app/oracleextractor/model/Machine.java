@@ -293,7 +293,7 @@ public class Machine {
             ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions();
             Transition actualTransition;
             try {
-                actualTransition = chooseTransition(possibleTransitions);
+                actualTransition = chooseTransition(possibleTransitions,TranSelection_Policy.RANDOM_SELECTION);
                 takeTransition(actualTransition);
             } catch (NoTransitionFound | TransitionNotApplicable e) {
                 // TODO: Is there something else todo here?
@@ -307,7 +307,7 @@ public class Machine {
             ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions();
             Transition actualTransition;
             try {
-                actualTransition = chooseTransition(possibleTransitions);
+                actualTransition = chooseTransition(possibleTransitions, TranSelection_Policy.INTERACTIVE_SELECTION);
                 takeTransition(actualTransition);
             } catch (NoTransitionFound | TransitionNotApplicable e) {
                 // TODO: Is there something else todo here?
@@ -325,16 +325,22 @@ public class Machine {
      * @param possibleTransitions the list of <code>Transition</code>s
      * @return the chosen <code>Transition</code>
      */
-    private Transition chooseTransition(ArrayList<Transition> possibleTransitions) throws NoTransitionFound {
-        var randomStream = new Random();
+    private Transition chooseTransition(ArrayList<Transition> possibleTransitions,
+                                        Machine.TranSelection_Policy selectionPolicy) throws NoTransitionFound {
+        Random randomStream = new Random();
+        Transition chosenTransition = null;
         if (possibleTransitions.isEmpty()) {
             throw new NoTransitionFound("No transitions found from the current state, State:" + currentState.getName() + "possibleTransitions: " + possibleTransitions);
         } else if (possibleTransitions.size() == 1) {
             return possibleTransitions.get(0);
         } else {
-            return possibleTransitions.get(randomStream.nextInt(possibleTransitions.size()));
+            if (selectionPolicy == TranSelection_Policy.INTERACTIVE_SELECTION){
+                chosenTransition = Utilities.getTransitionChooserPopup(possibleTransitions);
+            } else if (selectionPolicy == TranSelection_Policy.RANDOM_SELECTION) {
+                chosenTransition = possibleTransitions.get(randomStream.nextInt(possibleTransitions.size()));
+            }
         }
-        // Todo: Implement the transition chooser here!
+        return chosenTransition;
     }
 
     /**
@@ -518,5 +524,10 @@ public class Machine {
                 ", pendingInput=" + pendingInput + '\n' +
                 ", machineTransitions=" + machineTransitions +
                 '}';
+    }
+
+    private enum TranSelection_Policy {
+        RANDOM_SELECTION,
+        INTERACTIVE_SELECTION
     }
 }

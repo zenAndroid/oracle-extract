@@ -4,12 +4,21 @@ import app.oracleextractor.model.Machine;
 import app.oracleextractor.model.State;
 import app.oracleextractor.model.Transition;
 import app.oracleextractor.model.exceptions.StateNotFound;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -39,6 +48,66 @@ public class Utilities {
         Scene scene = new Scene(borderPane, 302, 75);
         retVal.setScene(scene);
         return retVal;
+    }
+
+    public static Transition getTransitionChooserPopup(ArrayList<Transition> transitions) {
+
+        final Transition[] chosenTransition = new Transition[1];
+
+        Stage popUp = new Stage();
+        popUp.initModality(Modality.APPLICATION_MODAL);
+        popUp.setTitle("Transition Chooser");
+
+
+        // Label setup
+        Label chooseLbl = new Label("Choose transition");
+        chooseLbl.setFont(new Font(24));
+
+
+        // Vbox setup; ListView Setup + Label setup.
+        VBox centerDisplay = new VBox(10);
+
+        //// ListView
+        ObservableList<Transition> transitionObservableList = FXCollections.observableArrayList(transitions);
+        ListView<Transition> transitionListView = new ListView<>(transitionObservableList);
+        VBox.setVgrow(transitionListView, Priority.ALWAYS); // Setting the grow property, GREEDY node !
+
+        ////// Setting the action to be taken in the event of clicking on one of the Transitions.
+
+        //// Label
+        Label tranLbl = new Label("Transition");
+        tranLbl.setFont(new Font(24));
+        centerDisplay.getChildren().addAll(transitionListView, tranLbl);
+
+        transitionListView.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observableValue, transition, t1) -> {
+            chosenTransition[0] = t1;
+            tranLbl.setText(transitionListView.getSelectionModel().getSelectedItem().toString());
+        });
+
+        // Button Bar Setup
+        ButtonBar buttonBar = new ButtonBar();
+        Button choose = new Button("Choose transition");
+        choose.setOnAction(actionEvent -> {
+            chosenTransition[0] = transitionListView.getSelectionModel().getSelectedItem();
+            popUp.close();
+        });
+        buttonBar.getButtons().add(choose);
+        BorderPane.setMargin(buttonBar, new Insets(4));
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setPadding(new Insets(5));
+        borderPane.setTop(chooseLbl);
+        borderPane.setCenter(centerDisplay);
+        borderPane.setBottom(buttonBar);
+
+        Scene scene = new Scene(borderPane,600,400);
+        popUp.setScene(scene);
+
+        popUp.showAndWait();
+
+        return chosenTransition[0];
     }
 
     /**

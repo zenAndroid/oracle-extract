@@ -6,71 +6,68 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.web.*?>
 
-<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="539.0" prefWidth="697.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="app.oracleextractor.DebugController">
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="539.0" prefWidth="697.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.oracleextractor.DebugController">
     <MenuBar>
         <Menu mnemonicParsing="false" text="File">
-            <MenuItem mnemonicParsing="false" text="Load machine"/>
+            <MenuItem mnemonicParsing="false" text="Load machine" />
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
-            <MenuItem mnemonicParsing="false" text="About"/>
+            <MenuItem mnemonicParsing="false" text="About" />
         </Menu>
     </MenuBar>
     <VBox prefHeight="74.0" prefWidth="600.0" spacing="5.0" VBox.vgrow="NEVER">
         <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
         </padding>
-        <Text fx:id="lblInput" strokeType="OUTSIDE" strokeWidth="0.0" text="Current Input: NONE"/>
-        <Text fx:id="lblCurrentState" strokeType="OUTSIDE" strokeWidth="0.0" text="Current State: NONE"/>
-        <Text fx:id="lblLastOutput" strokeType="OUTSIDE" strokeWidth="0.0" text="Last Output: NONE"/>
-        <Text fx:id="lblOutput" strokeType="OUTSIDE" strokeWidth="0.0" text="Output accumulator: NONE"/>
+        <Text fx:id="lblInput" strokeType="OUTSIDE" strokeWidth="0.0" text="Current Input: NONE" />
+        <Text fx:id="lblCurrentState" strokeType="OUTSIDE" strokeWidth="0.0" text="Current State: NONE" />
+        <Text fx:id="lblLastOutput" strokeType="OUTSIDE" strokeWidth="0.0" text="Last Output: NONE" />
+        <Text fx:id="lblOutput" strokeType="OUTSIDE" strokeWidth="0.0" text="Output accumulator: NONE" />
     </VBox>
-    <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0"
-             prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+    <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab text="Main UI">
             <VBox prefHeight="200.0" prefWidth="100.0">
-                <WebView fx:id="webView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS"/>
-                <ButtonBar buttonMinWidth="150.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="40.0"
-                           prefWidth="200.0">
+                <WebView fx:id="webView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                <ButtonBar buttonMinWidth="150.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="40.0" prefWidth="200.0">
                     <buttons>
-                        <Button fx:id="zoomOutButton" mnemonicParsing="false" text="Zoom out"/>
-                        <Button fx:id="zoomResetButton" mnemonicParsing="false" text="Reset zoom level"/>
-                        <Button fx:id="zoomInButton" mnemonicParsing="false" text="Zoom In"/>
+                        <Button fx:id="zoomOutButton" mnemonicParsing="false" text="Zoom out" />
+                        <Button fx:id="zoomResetButton" mnemonicParsing="false" text="Reset zoom level" />
+                        <Button fx:id="zoomInButton" mnemonicParsing="false" text="Zoom In" />
                     </buttons>
                     <padding>
-                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                     </padding>
                     <VBox.margin>
-                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                     </VBox.margin>
                 </ButtonBar>
             </VBox>
         </Tab>
         <Tab text="Execution log">
-            <TextArea fx:id="execLogTextArea" editable="false" prefHeight="200.0" prefWidth="200.0"/>
+            <TextArea fx:id="execLogTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" />
         </Tab>
     </TabPane>
     <HBox prefHeight="34.0" prefWidth="600.0" spacing="10.0" VBox.vgrow="NEVER">
         <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
         </padding>
         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Input:">
             <font>
-                <Font size="20.0"/>
+                <Font size="20.0" />
             </font>
         </Text>
-        <TextField fx:id="sendingInputField"/>
-        <Button fx:id="sndInputButton" mnemonicParsing="false" text="Send Input"/>
+        <TextField fx:id="sendingInputField" />
+        <Button fx:id="sndInputButton" mnemonicParsing="false" text="Send Input" />
     </HBox>
     <ButtonBar fx:id="buttonBar" buttonMinWidth="100.0" prefHeight="40.0" prefWidth="200.0">
       <buttons>
-          <Button fx:id="runMachineButton" mnemonicParsing="false" text="Run"/>
-          <Button fx:id="stepMachineButton" mnemonicParsing="false" text="Step"/>
-          <Button fx:id="resetMachineButton" mnemonicParsing="false" text="Reset"/>
+          <Button fx:id="runMachineButton" mnemonicParsing="false" text="Run" />
+          <Button fx:id="stepMachineButton" mnemonicParsing="false" text="Step" />
+          <Button fx:id="resetMachineButton" mnemonicParsing="false" text="Reset" />
+         <Button fx:id="saveLogButton" mnemonicParsing="false" text="Save Log" />
       </buttons>
         <padding>
-          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
         </padding>
     </ButtonBar>
 </VBox>

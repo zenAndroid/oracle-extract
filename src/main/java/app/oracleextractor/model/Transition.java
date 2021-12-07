@@ -112,4 +112,12 @@ public class Transition {
     public Boolean isTriggeredBy(Character trigger) {
         return getTransitionTrigger().equals(trigger);
     }
+
+    @Override
+    public String toString() {
+        return "Transition{" +
+                sourceState.getName() + " -> " + destinationState.getName() +
+                ", trigger: " + transitionTrigger +", output: " + transitionOutput +
+                '}';
+    }
 }

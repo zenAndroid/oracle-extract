@@ -5,6 +5,7 @@ import app.oracleextractor.model.exceptions.NoPendingInput;
 import app.oracleextractor.model.utils.Utilities;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.TextArea;
@@ -12,11 +13,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
-import java.io.BufferedReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -31,7 +31,8 @@ public class DebugController implements Initializable {
     WebView webView;
 
     @FXML
-    Button zoomOutButton, zoomResetButton, zoomInButton, sndInputButton, runMachineButton, stepMachineButton, resetMachineButton;
+    Button zoomOutButton, zoomResetButton, zoomInButton, sndInputButton,
+            runMachineButton, stepMachineButton, resetMachineButton, saveLogButton;
 
     @FXML
     TextField sendingInputField;
@@ -101,6 +102,25 @@ public class DebugController implements Initializable {
             log(LOGTYPE.RESET_MACHINE_ENTRY);
             updateUI();
         });
+
+        saveLogButton.setOnAction((actionEvent -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Choose logfile save location");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text files","*.txt"));
+            Node sauce = (Node) actionEvent.getSource();
+            Window theStage = sauce.getScene().getWindow();
+            File out = fileChooser.showSaveDialog(theStage);
+            try {
+                FileWriter outWriter = new FileWriter(out);
+                outWriter.write(execLogTextArea.getText());
+                outWriter.close();
+            } catch (IOException e) {
+                Utilities.getPopup("File exception","IOException: A problem occurred while saving the file").showAndWait();
+                e.printStackTrace();
+            }
+
+
+        }));
     }
 
     public void log(LOGTYPE type) {

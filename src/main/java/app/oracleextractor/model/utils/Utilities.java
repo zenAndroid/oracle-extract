@@ -4,11 +4,43 @@ import app.oracleextractor.model.Machine;
 import app.oracleextractor.model.State;
 import app.oracleextractor.model.Transition;
 import app.oracleextractor.model.exceptions.StateNotFound;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.Set;
 
 public class Utilities {
+
+    /**
+     * Makes a Popup appear with an OK button, and nothing else.
+     *
+     * @param title   The title.
+     * @param message The message.
+     * @return The JavaFX stage.
+     */
+    public static Stage getPopup(String title, String message) {
+        Stage retVal = new Stage();
+        retVal.initModality(Modality.APPLICATION_MODAL);
+        retVal.setTitle(title);
+        Label text = new Label(message);
+        Button okButton = new Button("Ok");
+        okButton.setOnAction(actionEvent -> retVal.close());
+        BorderPane borderPane = new BorderPane(text);
+        BorderPane.setAlignment(okButton, Pos.CENTER);
+        borderPane.setBottom(okButton);
+        borderPane.setPadding(new Insets(8));
+        Scene scene = new Scene(borderPane, 302, 75);
+        retVal.setScene(scene);
+        return retVal;
+    }
+
     /**
      * Temporary utility function to turn a string to an arraylist of characters.
      *

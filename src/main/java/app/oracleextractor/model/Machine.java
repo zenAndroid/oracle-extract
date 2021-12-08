@@ -1,9 +1,6 @@
 package app.oracleextractor.model;
 
-import app.oracleextractor.model.exceptions.NoPendingInput;
-import app.oracleextractor.model.exceptions.NoTransitionFound;
-import app.oracleextractor.model.exceptions.StateNotFound;
-import app.oracleextractor.model.exceptions.TransitionNotApplicable;
+import app.oracleextractor.model.exceptions.*;
 import app.oracleextractor.model.utils.StateTransition;
 import app.oracleextractor.model.utils.Trace;
 import app.oracleextractor.model.utils.Utilities;
@@ -143,7 +140,11 @@ public class Machine {
         // Creating the states;
         Machine sample = Utilities.getDefaultMachine();
         System.out.println(sample.toDot());
-        sample.nonDeterministicConsume(Utilities.stringToList("baabababba"));
+        try {
+            sample.nonDeterministicConsume(Utilities.stringToList("baabababba"));
+        } catch (BadInputException e) {
+            e.printStackTrace();
+        }
     }
 
     public Trace getMachineTrace() {
@@ -227,9 +228,14 @@ public class Machine {
      *
      * @param argInputSequence <code>Arraylist</code> representing the input.
      */
-    public void setInputSequence(ArrayList<Character> argInputSequence) {
-        inputSequence = argInputSequence;
-        pendingInput = true; // Input is now pending since we just set it!
+    public void setInputSequence(ArrayList<Character> argInputSequence) throws BadInputException {
+        if(inputAlphabet.containsAll(argInputSequence)){
+            inputSequence = argInputSequence;
+            pendingInput = true; // Input is now pending since we just set it!
+        } else {
+            throw new BadInputException("Input sequence contains element(s) not in input alphabet, argInputSequence: " +
+                    argInputSequence + ", inputAlphabet: " + inputAlphabet);
+        }
     }
 
     public Set<Character> getInputAlphabet() {
@@ -282,7 +288,7 @@ public class Machine {
         return getPendingInput();
     }
 
-    public void nonDeterministicConsume(ArrayList<Character> input) {
+    public void nonDeterministicConsume(ArrayList<Character> input) throws BadInputException {
         setInputSequence(input);
         nonDeterministicConsume();
     }
@@ -330,7 +336,8 @@ public class Machine {
         Random randomStream = new Random();
         Transition chosenTransition = null;
         if (possibleTransitions.isEmpty()) {
-            throw new NoTransitionFound("No transitions found from the current state, State:" + currentState.getName() + "possibleTransitions: " + possibleTransitions);
+            throw new NoTransitionFound("No transitions found from the current state, State:"
+                    + currentState.getName() + " possibleTransitions: " + possibleTransitions);
         } else if (possibleTransitions.size() == 1) {
             return possibleTransitions.get(0);
         } else {

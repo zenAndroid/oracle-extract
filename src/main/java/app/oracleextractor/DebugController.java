@@ -1,6 +1,7 @@
 package app.oracleextractor;
 
 import app.oracleextractor.model.Machine;
+import app.oracleextractor.model.exceptions.BadInputException;
 import app.oracleextractor.model.exceptions.NoPendingInput;
 import app.oracleextractor.model.utils.Utilities;
 import javafx.fxml.FXML;
@@ -71,11 +72,18 @@ public class DebugController implements Initializable {
             var input = Utilities.stringToList(sendingInputField.getText());
             sendingInputField.setText(""); // Empty the input field.
             if (input.size() > 0) {
-                machineOfInterest.setInputSequence(input);
-                // Enable the button bar
-                buttonBar.setDisable(false);
-                log(LOGTYPE.NEW_INPUT_ENTRY); // Log the new input
-                updateUI();
+                try {
+                    machineOfInterest.setInputSequence(input);
+                    // Enable the button bar
+                    buttonBar.setDisable(false);
+                    log(LOGTYPE.NEW_INPUT_ENTRY); // Log the new input
+                    updateUI();
+                } catch (BadInputException e) {
+                    e.printStackTrace();
+                    Utilities.getPopup("Bad input",
+                            "THe input does not conform to the machine's input alphabet").showAndWait();
+                }
+
             }
         });
 
@@ -86,7 +94,7 @@ public class DebugController implements Initializable {
                 updateUI();
             } catch (NoPendingInput e) {
                 e.printStackTrace();
-                Utilities.getPopup("No tokens left","There are no tokens left to consume").showAndWait();
+                Utilities.getPopup("No tokens left", "There are no tokens left to consume").showAndWait();
             }
 
         });
@@ -106,7 +114,7 @@ public class DebugController implements Initializable {
         saveLogButton.setOnAction((actionEvent -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose logfile save location");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text files","*.txt"));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text files", "*.txt"));
             Node sauce = (Node) actionEvent.getSource();
             Window theStage = sauce.getScene().getWindow();
             File out = fileChooser.showSaveDialog(theStage);
@@ -115,7 +123,7 @@ public class DebugController implements Initializable {
                 outWriter.write(execLogTextArea.getText());
                 outWriter.close();
             } catch (IOException e) {
-                Utilities.getPopup("File exception","IOException: A problem occurred while saving the file").showAndWait();
+                Utilities.getPopup("File exception", "IOException: A problem occurred while saving the file").showAndWait();
                 e.printStackTrace();
             }
 

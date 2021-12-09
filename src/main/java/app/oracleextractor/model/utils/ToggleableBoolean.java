@@ -11,6 +11,10 @@ public class ToggleableBoolean {
         return value;
     }
 
+    public void setValue(boolean val) {
+        value = val;
+    }
+
     public void toggleValue() {
         value = !value;
     }
@@ -21,10 +25,6 @@ public class ToggleableBoolean {
 
     public void setFalse() {
         value = false;
-    }
-
-    public void setValue(boolean val) {
-        value = val;
     }
 
 }

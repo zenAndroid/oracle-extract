@@ -35,6 +35,7 @@ public class Machine {
         this.machineTransitions = new ArrayList<>();
         this.machineTrace = new Trace();
     }
+
     public Machine(ArrayList<State> states, State initialState, Set<Character> inputAlphabet, Set<Character> outputAlphabet, ArrayList<Transition> machineTransitions) {
         this.states = states;
         this.initialState = initialState;
@@ -46,6 +47,7 @@ public class Machine {
         this.producedOutput = new ArrayList<>();
         this.machineTrace = new Trace();
     }
+
     public Machine(ArrayList<State> states, State initialState, Set<Character> inputAlphabet, Set<Character> outputAlphabet) {
         this.states = states;
         this.initialState = initialState;
@@ -58,6 +60,7 @@ public class Machine {
         this.machineTransitions = new ArrayList<>();
         this.machineTrace = new Trace();
     }
+
     public Machine() {
         this.pendingInput = false;
         states = new ArrayList<>();

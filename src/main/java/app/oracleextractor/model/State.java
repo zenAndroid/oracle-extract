@@ -14,6 +14,7 @@ public record State(String stateName, ArrayList<Transition> outGoing, ArrayList<
         return new State(stateName, out, in);
 
     }
+
     public static State getState(String stateName) {
         ArrayList<Transition> out = new ArrayList<>();
         ArrayList<Transition> in = new ArrayList<>();

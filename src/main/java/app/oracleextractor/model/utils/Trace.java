@@ -20,7 +20,7 @@ public class Trace {
         return theTrace.get(lastElementIndex);
     }
 
-    public void clear(){
+    public void clear() {
         theTrace.clear();
     }
 

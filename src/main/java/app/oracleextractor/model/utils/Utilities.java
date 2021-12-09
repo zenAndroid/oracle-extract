@@ -122,33 +122,29 @@ public class Utilities {
         return retVal;
     }
 
-    /**
-     * @return A default machine, hardcoded and used for testing purposes.
-     */
     public static Machine getDefaultMachine() {
-
         Machine debug = new Machine();
 
         /*
         The state are created, with their uniques names;
          */
-        State s1 = new State();
-        State s2 = new State();
-        State s3 = new State();
-        State s4 = new State();
+        State s1 = State.getState();
+        State s2 = State.getState();
+        State s3 = State.getState();
+        State s4 = State.getState();
         /*
         The transitions are created with their trigger, output, source states and destination states.
          */
-        Transition t1 = new Transition('b', '2', s1, s2);
-        Transition tnd2 = new Transition('b', '8', s1, s4);
-        Transition t2 = new Transition('a', '1', s1, s4);
-        Transition t3 = new Transition('a', '3', s2, s1);
-        Transition t4 = new Transition('b', '2', s2, s3);
-        Transition t5 = new Transition('a', '1', s3, s2);
-        Transition t6 = new Transition('b', '2', s3, s1);
-        Transition t7 = new Transition('b', '1', s4, s1);
-        Transition t8 = new Transition('a', '2', s4, s3);
-        Transition tnd9 = new Transition('a', '2', s4, s2); // Non-determinism test
+        Transition t1 = Transition.getInstance('b', '2', s1, s2);
+        Transition tnd2 = Transition.getInstance('b', '8', s1, s4);
+        Transition t2 = Transition.getInstance('a', '1', s1, s4);
+        Transition t3 = Transition.getInstance('a', '3', s2, s1);
+        Transition t4 = Transition.getInstance('b', '2', s2, s3);
+        Transition t5 = Transition.getInstance('a', '1', s3, s2);
+        Transition t6 = Transition.getInstance('b', '2', s3, s1);
+        Transition t7 = Transition.getInstance('b', '1', s4, s1);
+        Transition t8 = Transition.getInstance('a', '2', s4, s3);
+        Transition tnd9 = Transition.getInstance('a', '2', s4, s2); // Non-determinism test
 
         debug.setInitialState(s1);
 
@@ -173,7 +169,7 @@ public class Utilities {
     public static State getStateByName(ArrayList<State> newStates, String name) throws StateNotFound {
         State retVal = null;
         for (State s : newStates) {
-            if (s.getName().equals(name)) {
+            if (s.stateName().equals(name)) {
                 retVal = s;
             }
         }
@@ -182,7 +178,6 @@ public class Utilities {
         }
         return retVal;
     }
-
 
     public static ArrayList<Trace> evalMachine(Machine mach, ArrayList<Character> input) throws StuckMachineException {
         ArrayList<Trace> allPossibleTraces = new ArrayList<>();
@@ -193,15 +188,11 @@ public class Utilities {
             try {
                 mach.getMachineTrace().clear();
                 mach.setInputSequence(input);
-                ArrayList<Transition> transitions = mach.getCurrentState().getApplicableTransitions();
+                ArrayList<Transition> transitions = mach.getCurrentState()
+                        .getApplicableTransitions(mach.getNextInputToken(), mach.getMachineTransitions());
                 if (transitions.isEmpty()) {
-                    // If there are no transitions ... while there still is input ...
                     throw new StuckMachineException("Stuck: No transitions, but pending input.",
                             mach.getProducedOutput(), mach.getInputSequence());
-                    // Now i am Wondering if it even makes sense to have custom exceptions if
-                    // my exception don't really have any new state to hold ...
-                    // Well, i guess i might as well have them custom to know which state im in, but man i dont want
-                    // to cargo cult this, oh well.
                 }
                 for (Transition t : transitions) {
                     Machine clone = mach.makeMachineCopy(); // Clone, has same data, same states, transitions, same I/O alphabet
@@ -210,19 +201,14 @@ public class Utilities {
                     // Previous code  |
                     // Previous code  | : Problem : the transition t belongs to mach, not clone,
                     // so we have to find the equivalent transition in clone
-                    clone.takeTransition(Utilities.findTransition(t,clone));
+                    clone.takeTransition(Utilities.findTransition(t, clone));
                     // didnt fucking work ...
                     ArrayList<Trace> trace = evalMachine(clone, mach.getInputSequence());
                     allPossibleTraces.addAll(trace);
                 }
-            } catch (BadInputException e) {
+            } catch (BadInputException | TransitionNotFound | TransitionNotApplicable e) {
                 // This can happen if the initial input is malformed with the first invocation of this method
                 // but it shouldn't be a problem on later invocations
-                e.printStackTrace();
-            } catch (TransitionNotApplicable e) {
-                System.err.println(e.getMessage());
-                e.printStackTrace();
-            } catch (TransitionNotFound e){
                 e.printStackTrace();
             }
         }
@@ -231,16 +217,24 @@ public class Utilities {
 
     public static Transition findTransition(Transition t, Machine mach) throws TransitionNotFound {
         for (Transition transition : mach.getMachineTransitions()) {
-            Boolean sameTrigger = transition.getTransitionTrigger().equals(t.getTransitionTrigger());
-            Boolean sameOutput = transition.getTransitionOutput().equals(t.getTransitionOutput());
-            Boolean sameSource = transition.getSourceState().getName()
-                    .equals(t.getSourceState().getName());
-            Boolean sameDest = transition.getDestinationState().getName()
-                    .equals(t.getDestinationState().getName());
+            Boolean sameTrigger = transition.transitionTrigger().equals(t.transitionTrigger());
+            Boolean sameOutput = transition.transitionOutput().equals(t.transitionOutput());
+            Boolean sameSource = transition.sourceState().stateName()
+                    .equals(t.sourceState().stateName());
+            Boolean sameDest = transition.destinationState().stateName()
+                    .equals(t.destinationState().stateName());
             if (sameTrigger && sameOutput && sameSource && sameDest) {
                 return transition;
             }
         }
         throw new TransitionNotFound("No equivalent transition found !");
+    }
+
+    public static String getInputAsString(Machine argMach) {
+        StringBuilder retVal = new StringBuilder(argMach.getInputSequence().size());
+        for (Character ch : argMach.getInputSequence()) {
+            retVal.append(ch);
+        }
+        return retVal.toString();
     }
 }

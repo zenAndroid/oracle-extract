@@ -1,7 +1,6 @@
 package app.oracleextractor.model;
 
 import app.oracleextractor.model.exceptions.*;
-import app.oracleextractor.model.utils.StateTransition;
 import app.oracleextractor.model.utils.Trace;
 import app.oracleextractor.model.utils.Utilities;
 
@@ -10,28 +9,6 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Set;
 
-/**
- * Class represents a Mealy Machine, a kind of finite-state-machine.
- * The model used in this program is such that: <br />
- * A machine is a class that has:
- * <ul>
- *     <li>A set of states (Implemented as an Arraylist)</li>
- *     <li>An initial <code>State</code></li>
- *     <li>A current <code>State</code></li>
- *     <li>An <code>inputSequence</code>, representing the input sequence fed to the machine.</li>
- *     <li>A <code>producedOutput</code>, representing the output produced so far.</li>
- *     <li><code>lastOutput</code>, a variable that holds the last output produced in this machine.</li>
- *     <li>Two non-modifiable sets: (whether these will remain in the implementation as is, remains to be seen)
- *          <ul> <li><code>inputAlphabet</code>, A set of Character representing the input alphabet</li>
- *               <li><code>outputAlphabet</code>, A set of Character representing the output alphabet</li>
- *          </ul>
- *     </li>
- *     <li><code>pendingInput</code>, a boolean flag representing whether there is still input.</li>
- *     <li><code>Trace</code>, a data structure that holds all of the <code>StateTransition</code>s that have occured</li>
- * </ul>
- *
- * @author zenAndroid
- */
 public class Machine {
 
     private ArrayList<State> states;
@@ -46,18 +23,6 @@ public class Machine {
     private ArrayList<Transition> machineTransitions;
     private Trace machineTrace;
 
-    /**
-     * Constructor for an object of the <code>Machine</code> class.
-     * <br />
-     * Note that this constructor sets the <code>pendingInput</code> flag to true, since the input sequence is passed in as an argument to this constructor. <br />
-     * This also initializes the necessary member variables.
-     *
-     * @param states         The states.
-     * @param initialState   The initial state of this machine.
-     * @param inputSequence  The current sequence of inputs.
-     * @param inputAlphabet  The input alphabet.
-     * @param outputAlphabet The output alphabet.
-     */
     public Machine(ArrayList<State> states, State initialState, ArrayList<Character> inputSequence, Set<Character> inputAlphabet, Set<Character> outputAlphabet) {
         this.states = states;
         this.initialState = initialState;
@@ -70,16 +35,6 @@ public class Machine {
         this.machineTransitions = new ArrayList<>();
         this.machineTrace = new Trace();
     }
-
-    /**
-     * <code>Machine</code> Constructor. <br /> This also initializes the necessary member variables.
-     *
-     * @param states             The <code>State</code>s that belong to this <code>Machine</code>.
-     * @param initialState       The initial <code>State</code>.
-     * @param inputAlphabet      The <code>Arraylist</code> of <code>Character</code>s representing the input alphabet.
-     * @param outputAlphabet     The <code>Arraylist</code> of <code>Character</code>s representing the output alphabet.
-     * @param machineTransitions The <code>Arraylist</code> of <code>Transition</code>s in this machine.
-     */
     public Machine(ArrayList<State> states, State initialState, Set<Character> inputAlphabet, Set<Character> outputAlphabet, ArrayList<Transition> machineTransitions) {
         this.states = states;
         this.initialState = initialState;
@@ -91,17 +46,6 @@ public class Machine {
         this.producedOutput = new ArrayList<>();
         this.machineTrace = new Trace();
     }
-
-    /**
-     * Constructor for an object of the <code>Machine</code> class, when the input sequence isn't known at creation-time.
-     * <p>
-     * Note that this constructor sets the <code>pendingInput</code> flag to <code>false</code>.
-     *
-     * @param states         The states.
-     * @param initialState   The initial state of this machine.
-     * @param inputAlphabet  The input alphabet.
-     * @param outputAlphabet The output alphabet.
-     */
     public Machine(ArrayList<State> states, State initialState, Set<Character> inputAlphabet, Set<Character> outputAlphabet) {
         this.states = states;
         this.initialState = initialState;
@@ -114,14 +58,10 @@ public class Machine {
         this.machineTransitions = new ArrayList<>();
         this.machineTrace = new Trace();
     }
-
-    /**
-     * Default constructor, initializes no field except the <code>pendingInput</code> flag to <code>false</code>.
-     */
     public Machine() {
         this.pendingInput = false;
         states = new ArrayList<>();
-        initialState = new State();
+        initialState = State.getState();
         currentState = initialState;
         inputSequence = new ArrayList<>();
         inputAlphabet = Set.of();
@@ -135,17 +75,16 @@ public class Machine {
      * TODO: Create a function that separately initializes all of the ad-hoc member variable, instead of duplicating code/work.
      */
 
-
     public static void main(String[] args) {
         // Creating the states;
         Machine sample = Utilities.getDefaultMachine();
         Machine simpleMachine = new Machine();
-        State one = new State("1");
-        State two = new State("2");
-        Transition temp = new Transition('a', '1', one, two);
-        Transition temp1 = new Transition('a', '2', one, two);
-        Transition temp2 = new Transition('b', '2', two, one);
-        Transition temp3 = new Transition('b', '1', two, one);
+        State one = State.getState("1");
+        State two = State.getState("2");
+        Transition temp = Transition.getInstance('a', '1', one, two);
+        Transition temp1 = Transition.getInstance('a', '2', one, two);
+        Transition temp2 = Transition.getInstance('b', '2', two, one);
+        Transition temp3 = Transition.getInstance('b', '1', two, one);
         simpleMachine.setInitialState(one);
 
         simpleMachine.setInputAlphabet(Set.of('a', 'b'));
@@ -159,7 +98,7 @@ public class Machine {
         // System.out.println(sample.toDot());
         try {
             // simpleMachine.nonDeterministicConsume(Utilities.stringToList("ab"));
-            System.out.println(Utilities.evalMachine(simpleMachine, Utilities.stringToList("ab")));
+            System.out.println(Utilities.evalMachine(simpleMachine, Utilities.stringToList("aba")).size());
         } catch (/*BadInputException | */StuckMachineException e) {
             e.printStackTrace();
         }
@@ -173,43 +112,25 @@ public class Machine {
         this.machineTrace = machineTrace;
     }
 
-    /**
-     * Standard getter for the <code>State</code>s of this machine.
-     *
-     * @return <code>State</code>s of the machine.
-     */
+
     public ArrayList<State> getStates() {
         return states;
     }
 
-    /**
-     * Standard setter for the Array of <code>State</code>s.
-     * <br />
-     * This setter then gives all the passed states the calling instantiated <code>Machine</code> as the 'owner' machine.
-     *
-     * @param argStates Array of <code>State</code>s
-     */
+
     public void setStates(ArrayList<State> argStates) {
         states = new ArrayList<>();
         for (State s : argStates) { // These state do not have a machine as an owner, so we set it for them.
-            s.setMach(this);
             states.add(s);
         }
         // TODO: Test this functionality!
         //  And I assume people that will come after me will (hopefully) make a proper testing suite.
     }
 
-    /**
-     * Setter for the states that utilizes the var-arg capabilities to allow for ease of construction of <code>State</code>s.
-     * <br />
-     * This setter then gives all the passed states the calling instantiated <code>Machine</code> as the 'owner' machine.
-     *
-     * @param argStates Array of <code>State</code>s
-     */
+
     public void setStates(State... argStates) {
         states = new ArrayList<>(); // Not sure this is even needed ... EDIT: It's crucial, let it be
         for (State s : argStates) {
-            s.setMach(this);
             states.add(s);
         }
     }
@@ -218,13 +139,8 @@ public class Machine {
         return initialState;
     }
 
-    /**
-     * This sets the initial state of the machine; it also sets the machine's current state;*
-     *
-     * @param argInitialState Argument <code>State</code>
-     */
+
     public void setInitialState(State argInitialState) {
-        argInitialState.mach = this;
         initialState = argInitialState;
         currentState = argInitialState;
     }
@@ -241,11 +157,7 @@ public class Machine {
         return inputSequence;
     }
 
-    /**
-     * Sets the <code>Machine</code>'s input sequence.
-     *
-     * @param argInputSequence <code>Arraylist</code> representing the input.
-     */
+
     public void setInputSequence(ArrayList<Character> argInputSequence) throws BadInputException {
         if (inputAlphabet.containsAll(argInputSequence)) {
             inputSequence = argInputSequence;
@@ -297,11 +209,7 @@ public class Machine {
         // Boy this syntax is ... interesting ... i think i almost prefer the old natural way ...
     }
 
-    /**
-     * Returns whether there is still input to be processed by the machine.
-     *
-     * @return the boolean value that represents the availability of input.
-     */
+
     public Boolean isPending() {
         return getPendingInput();
     }
@@ -314,9 +222,11 @@ public class Machine {
     public void nonDeterministicConsume() {
         machineTrace.clear(); // Clear the trace.
         while (isPending()) {
-            ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions();
-            Transition actualTransition;
             try {
+                ArrayList<Transition> possibleTransitions = currentState
+                        .getApplicableTransitions(getNextInputToken(), machineTransitions);
+                Transition actualTransition;
+
                 actualTransition = chooseTransition(possibleTransitions, TranSelection_Policy.RANDOM_SELECTION);
                 takeTransition(actualTransition);
             } catch (NoTransitionFound | TransitionNotApplicable e) {
@@ -328,7 +238,8 @@ public class Machine {
 
     public void nonDeterministicallyConsumeToken() throws NoPendingInput {
         if (isPending()) {
-            ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions();
+            ArrayList<Transition> possibleTransitions = currentState
+                    .getApplicableTransitions(getNextInputToken(), machineTransitions);
             Transition actualTransition;
             try {
                 actualTransition = chooseTransition(possibleTransitions, TranSelection_Policy.INTERACTIVE_SELECTION);
@@ -342,20 +253,14 @@ public class Machine {
         }
     }
 
-    /**
-     * To allow a <code>Transition</code> to be chosen, abstracted to its own method to allow for: <br />
-     * a) random selection, <i>and</i> b) interactive selection.
-     *
-     * @param possibleTransitions the list of <code>Transition</code>s
-     * @return the chosen <code>Transition</code>
-     */
+
     private Transition chooseTransition(ArrayList<Transition> possibleTransitions,
-                                        Machine.TranSelection_Policy selectionPolicy) throws NoTransitionFound {
+                                        TranSelection_Policy selectionPolicy) throws NoTransitionFound {
         Random randomStream = new Random();
         Transition chosenTransition = null;
         if (possibleTransitions.isEmpty()) {
             throw new NoTransitionFound("No transitions found from the current state, State:"
-                    + currentState.getName() + " possibleTransitions: " + possibleTransitions);
+                    + currentState.stateName() + " possibleTransitions: " + possibleTransitions);
         } else if (possibleTransitions.size() == 1) {
             return possibleTransitions.get(0);
         } else {
@@ -368,13 +273,7 @@ public class Machine {
         return chosenTransition;
     }
 
-    /**
-     * This method reads the next token and passes it down to its current state. <br />
-     * The method removes also returns the removed object, so it can be used for this purpose.
-     * todo: What if there IS no input? deal with this case. EDIT: DONE (I think ...)
-     *
-     * @return Next input token.
-     */
+
     public Character getNextInputToken() {
         // Removes also returns the removed element, so we can use it to achieve two actions;
         // (knowing about the next input token, and removing it as well)
@@ -386,26 +285,8 @@ public class Machine {
         return tok;
     }
 
-    /**
-     * Method to extract all of the output produced by this machine.
-     *
-     * @return A string containing the entire output.
-     */
     public ArrayList<Character> getProducedOutput() {
         return producedOutput;
-    }
-
-    /**
-     * Method to get the input Sequence as a string.
-     *
-     * @return String representing output
-     */
-    public String getInputAsString() {
-        StringBuilder retVal = new StringBuilder(inputSequence.size());
-        for (Character ch : inputSequence) {
-            retVal.append(ch);
-        }
-        return retVal.toString();
     }
 
     /**
@@ -414,19 +295,18 @@ public class Machine {
      * @param transition The <code>Transition</code> that will be traversed by the machine.
      */
     public void takeTransition(Transition transition) throws TransitionNotApplicable {
-        if (transition.getSourceState().getName().equals(getCurrentState().getName())) {
-            StateTransition newST = new StateTransition(currentState, transition.getDestinationState(), transition);
-            machineTrace.addSTransition(newST);
+        if (transition.sourceState().stateName().equals(getCurrentState().stateName())) {
+            machineTrace.addTransition(transition);
             transition.setTaken();
-            processOutput(transition.getTransitionOutput());
-            setCurrentState(transition.getDestinationState());
+            processOutput(transition.transitionOutput());
+            setCurrentState(transition.destinationState());
         } else {
             throw new TransitionNotApplicable("Transition not applicable from this state. arg: "
                     + transition
                     + " , Current State: "
                     + getCurrentState()
                     + " , Source state: "
-                    + transition.getSourceState());
+                    + transition.sourceState());
         }
     }
 
@@ -460,18 +340,18 @@ public class Machine {
     public String toDot() { // TODO: honestly, this can go to utilities man
         StringBuilder b = new StringBuilder("digraph Automaton {\n");
         b.append("    node [shape=point] INIT;\n");
-        b.append("    ").append(currentState.getName()).append(" ").append("[shape=\"doublecircle\"];\n");
+        b.append("    ").append(currentState.stateName()).append(" ").append("[shape=\"doublecircle\"];\n");
         b.append("    node [shape=circle];\n");
         b.append("    rankdir = LR;\n");
-        b.append("    INIT -> ").append(getInitialState().getName()).append(";\n");
+        b.append("    INIT -> ").append(getInitialState().stateName()).append(";\n");
         ArrayList<State> machineStates = getStates();
         for (State s : machineStates) {
             var stateTranses = getTransitionsFromState(s); // The transintions that come from this state.
             for (Transition t : stateTranses) {
-                b.append("    ").append(s.getName()).append(" -> ").append(t.getDestinationState().getName()).append(" ");
-                b.append("[label=\"").append(t.getTransitionTrigger())
+                b.append("    ").append(s.stateName()).append(" -> ").append(t.destinationState().stateName()).append(" ");
+                b.append("[label=\"").append(t.transitionTrigger())
                         .append("/")
-                        .append(t.getTransitionOutput())
+                        .append(t.transitionOutput())
                         .append(t.wasTaken() ? "\", color=red];" : "\"];")
                         .append("\n");
             }
@@ -482,7 +362,7 @@ public class Machine {
     private ArrayList<Transition> getTransitionsFromState(State s) {
         ArrayList<Transition> transitions = new ArrayList<>();
         for (Transition t : machineTransitions) {
-            if (t.getSourceState().equals(s)) {
+            if (t.sourceState().equals(s)) {
                 // This transition comes from this state, so OK to add it
                 transitions.add(t);
             }
@@ -504,13 +384,14 @@ public class Machine {
         retVal.setOutputAlphabet(getOutputAlphabet()); // Yeah yeah
         var newStates = new ArrayList<State>(); // The clones of the states.
         for (State s : getStates()) {
-            newStates.add(new State(s.getName())); // Adding the NEW states based on the name of the old ones.
+            newStates.add(State.getState(s.stateName())); // Adding the NEW states based on the name of the old ones.
             // Based on the NAMES of the OLD states, NOT THEIR REFERENCES!!!
         }
         retVal.setStates(newStates); // Setting the new States in the new machine.
         // Setting the new machine's initial state.
         try {
-            retVal.setInitialState(Utilities.getStateByName(newStates, getInitialState().getName()));
+            retVal.setInitialState(Utilities.getStateByName(newStates, getInitialState().stateName()));
+            retVal.setCurrentState(Utilities.getStateByName(newStates, getCurrentState().stateName()));
         } catch (StateNotFound e) {
             // Something went terribly wrong ...
             e.printStackTrace();
@@ -523,10 +404,10 @@ public class Machine {
         var newTransitions = new ArrayList<Transition>();
         for (Transition t : machineTransitions) {
             try {
-                newTransitions.add(new Transition(t.getTransitionTrigger(),
-                        t.getTransitionOutput(),
-                        Utilities.getStateByName(newStates, t.getSourceState().getName()),
-                        Utilities.getStateByName(newStates, t.getDestinationState().getName())));
+                newTransitions.add(Transition.getInstance(t.transitionTrigger(),
+                        t.transitionOutput(),
+                        Utilities.getStateByName(newStates, t.sourceState().stateName()),
+                        Utilities.getStateByName(newStates, t.destinationState().stateName())));
             } catch (StateNotFound e) {
                 // Todo: some thing to do?
                 e.printStackTrace();

@@ -135,7 +135,7 @@ public class DebugController implements Initializable {
         String existingContent = execLogTextArea.getText();
         String newContent = "";
         switch (type) {
-            case NEW_INPUT_ENTRY -> newContent = "New input to the machine: " + machineOfInterest.getInputAsString() + '\n';
+            case NEW_INPUT_ENTRY -> newContent = "New input to the machine: " + Utilities.getInputAsString(machineOfInterest) + '\n';
             case STEP_ENTRY -> newContent = machineOfInterest.getMachineTrace().getLastChange().toString() + '\n';
             case RUN_ENTRY -> newContent = "Complete machine execution.\n" + machineOfInterest.getMachineTrace().toString() + '\n';
             case RESET_MACHINE_ENTRY -> newContent = "Machine reset to initial state.\n";
@@ -179,8 +179,8 @@ public class DebugController implements Initializable {
      * Updates the labels above the <code>Machine</code>'s view, as well as the <code>Machine</code> view itself.
      */
     public void updateUI() {
-        lblInput.setText("Input : " + machineOfInterest.getInputAsString());
-        lblCurrentState.setText("Current State: " + machineOfInterest.getCurrentState().getName());
+        lblInput.setText("Input : " + Utilities.getInputAsString(machineOfInterest));
+        lblCurrentState.setText("Current State: " + machineOfInterest.getCurrentState().stateName());
         if (machineOfInterest.getLastOutput() != null) {
             lblLastOutput.setText("Last Output: " + machineOfInterest.getLastOutput());
         }

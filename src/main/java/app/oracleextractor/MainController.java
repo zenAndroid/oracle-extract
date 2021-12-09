@@ -64,16 +64,19 @@ public class MainController implements Initializable {
         // 9- CONSUME !!!
 
         // 1- States.
-        State q1 = new State("s0"), q2 = new State("s1"), q3 = new State("s2"), q4 = new State("s3");
+        State q1 = State.getState("s0"),
+                q2 = State.getState("s1"),
+                q3 = State.getState("s2"),
+                q4 = State.getState("s3");
         // 2- Transitions
-        Transition tr1 = new Transition('b', '0', q1, q1); // q1
-        Transition tr2 = new Transition('a', '0', q1, q2); // q1
-        Transition tr3 = new Transition('a', '1', q2, q2); // q2
-        Transition tr4 = new Transition('b', '0', q2, q3); // q2
-        Transition tr5 = new Transition('a', '1', q3, q4); // q3
-        Transition tr6 = new Transition('b', '0', q3, q3); // q3
-        Transition tr7 = new Transition('a', '1', q4, q4); // q4
-        Transition tr8 = new Transition('b', '1', q4, q4); // q4
+        Transition tr1 = Transition.getInstance('b', '0', q1, q1); // q1
+        Transition tr2 = Transition.getInstance('a', '0', q1, q2); // q1
+        Transition tr3 = Transition.getInstance('a', '1', q2, q2); // q2
+        Transition tr4 = Transition.getInstance('b', '0', q2, q3); // q2
+        Transition tr5 = Transition.getInstance('a', '1', q3, q4); // q3
+        Transition tr6 = Transition.getInstance('b', '0', q3, q3); // q3
+        Transition tr7 = Transition.getInstance('a', '1', q4, q4); // q4
+        Transition tr8 = Transition.getInstance('b', '1', q4, q4); // q4
         // 3- Giving states their transitions.
         // 4- Set the initial State
         MM.setInitialState(q1);
@@ -84,7 +87,7 @@ public class MainController implements Initializable {
         // 7- Set the machine states
         MM.setStates(q1, q2, q3, q4);
 
-        MM.setMachineTransitions(tr1,tr2,tr3,tr4,tr5,tr6,tr7,tr8 );
+        MM.setMachineTransitions(tr1, tr2, tr3, tr4, tr5, tr6, tr7, tr8);
         // 8- Set the input sequence. and consume
         // ----------------------------- MM.consume(new
         // ArrayList<>(List.of('a','b','b','a','b','b','b','a')));

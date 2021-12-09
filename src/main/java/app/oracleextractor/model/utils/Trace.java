@@ -1,37 +1,21 @@
 package app.oracleextractor.model.utils;
 
-import app.oracleextractor.model.State;
 import app.oracleextractor.model.Transition;
-import app.oracleextractor.model.utils.StateTransition;
 
 import java.util.ArrayList;
 
 public class Trace {
-    ArrayList<StateTransition> theTrace;
+    ArrayList<Transition> theTrace;
 
     public Trace() {
         theTrace = new ArrayList<>();
     }
 
-    /**
-     * Method to add a <code>StateTransition</code> record to the list of <code>StateTransition</code>s.
-     * @param before The <code>State</code> before taking the <code>Transition</code>
-     * @param after The <code>State</code> after taking the <code>Transition</code>
-     * @param transition The <code>Transition</code> itself.
-     */
-    public void addSTransition(State before, State after, Transition transition) {
-        theTrace.add(new StateTransition(before, after, transition));
+    public void addTransition(Transition t) {
+        theTrace.add(t);
     }
 
-    /**
-     * Method to add a <code>StateTransition</code> record to the list of <code>StateTransition</code>s.
-     * @param argStateTransition <code>StateTransition</code> to be added.
-     */
-    public void addSTransition(StateTransition argStateTransition) {
-        theTrace.add(argStateTransition);
-    }
-
-    public StateTransition getLastChange() {
+    public Transition getLastChange() {
         int lastElementIndex = theTrace.size() - 1;
         return theTrace.get(lastElementIndex);
     }

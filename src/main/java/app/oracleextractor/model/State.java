@@ -73,5 +73,9 @@ public class State {
         return applicableTransitions;
     }
 
+    @Override
+    public String toString() {
+        return "State{stateName='" + stateName + '\'' + '}';
+    }
 }
 

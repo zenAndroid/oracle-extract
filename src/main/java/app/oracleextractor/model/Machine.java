@@ -139,10 +139,28 @@ public class Machine {
     public static void main(String[] args) {
         // Creating the states;
         Machine sample = Utilities.getDefaultMachine();
-        System.out.println(sample.toDot());
+        Machine simpleMachine = new Machine();
+        State one = new State("1");
+        State two = new State("2");
+        Transition temp = new Transition('a', '1', one, two);
+        Transition temp1 = new Transition('a', '2', one, two);
+        Transition temp2 = new Transition('b', '2', two, one);
+        Transition temp3 = new Transition('b', '1', two, one);
+        simpleMachine.setInitialState(one);
+
+        simpleMachine.setInputAlphabet(Set.of('a', 'b'));
+
+        simpleMachine.setOutputAlphabet(Set.of('1', '2'));
+
+        simpleMachine.setStates(one, two);
+
+        simpleMachine.setMachineTransitions(temp, temp1, temp2, temp3);
+
+        // System.out.println(sample.toDot());
         try {
-            sample.nonDeterministicConsume(Utilities.stringToList("baabababba"));
-        } catch (BadInputException e) {
+            // simpleMachine.nonDeterministicConsume(Utilities.stringToList("ab"));
+            System.out.println(Utilities.evalMachine(simpleMachine, Utilities.stringToList("ab")));
+        } catch (/*BadInputException | */StuckMachineException e) {
             e.printStackTrace();
         }
     }
@@ -229,7 +247,7 @@ public class Machine {
      * @param argInputSequence <code>Arraylist</code> representing the input.
      */
     public void setInputSequence(ArrayList<Character> argInputSequence) throws BadInputException {
-        if(inputAlphabet.containsAll(argInputSequence)){
+        if (inputAlphabet.containsAll(argInputSequence)) {
             inputSequence = argInputSequence;
             pendingInput = true; // Input is now pending since we just set it!
         } else {
@@ -299,7 +317,7 @@ public class Machine {
             ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions();
             Transition actualTransition;
             try {
-                actualTransition = chooseTransition(possibleTransitions,TranSelection_Policy.RANDOM_SELECTION);
+                actualTransition = chooseTransition(possibleTransitions, TranSelection_Policy.RANDOM_SELECTION);
                 takeTransition(actualTransition);
             } catch (NoTransitionFound | TransitionNotApplicable e) {
                 // TODO: Is there something else todo here?
@@ -341,7 +359,7 @@ public class Machine {
         } else if (possibleTransitions.size() == 1) {
             return possibleTransitions.get(0);
         } else {
-            if (selectionPolicy == TranSelection_Policy.INTERACTIVE_SELECTION){
+            if (selectionPolicy == TranSelection_Policy.INTERACTIVE_SELECTION) {
                 chosenTransition = Utilities.getTransitionChooserPopup(possibleTransitions);
             } else if (selectionPolicy == TranSelection_Policy.RANDOM_SELECTION) {
                 chosenTransition = possibleTransitions.get(randomStream.nextInt(possibleTransitions.size()));
@@ -373,12 +391,8 @@ public class Machine {
      *
      * @return A string containing the entire output.
      */
-    public String getProducedOutput() {
-        StringBuilder retVal = new StringBuilder(producedOutput.size());
-        for (Character ch : producedOutput) {
-            retVal.append(ch);
-        }
-        return retVal.toString();
+    public ArrayList<Character> getProducedOutput() {
+        return producedOutput;
     }
 
     /**
@@ -400,14 +414,19 @@ public class Machine {
      * @param transition The <code>Transition</code> that will be traversed by the machine.
      */
     public void takeTransition(Transition transition) throws TransitionNotApplicable {
-        if (transition.getSourceState().equals(getCurrentState())) {
+        if (transition.getSourceState().getName().equals(getCurrentState().getName())) {
             StateTransition newST = new StateTransition(currentState, transition.getDestinationState(), transition);
             machineTrace.addSTransition(newST);
             transition.setTaken();
             processOutput(transition.getTransitionOutput());
             setCurrentState(transition.getDestinationState());
         } else {
-            throw new TransitionNotApplicable("Transition not applicable from this state. arg: " + transition);
+            throw new TransitionNotApplicable("Transition not applicable from this state. arg: "
+                    + transition
+                    + " , Current State: "
+                    + getCurrentState()
+                    + " , Source state: "
+                    + transition.getSourceState());
         }
     }
 
@@ -438,7 +457,7 @@ public class Machine {
      * @return A <a href="http://www.research.att.com/sw/tools/graphviz/" target="_top">Graphviz Dot</a>
      * representation of this automaton.
      */
-    public String toDot() {
+    public String toDot() { // TODO: honestly, this can go to utilities man
         StringBuilder b = new StringBuilder("digraph Automaton {\n");
         b.append("    node [shape=point] INIT;\n");
         b.append("    ").append(currentState.getName()).append(" ").append("[shape=\"doublecircle\"];\n");
@@ -485,14 +504,15 @@ public class Machine {
         retVal.setOutputAlphabet(getOutputAlphabet()); // Yeah yeah
         var newStates = new ArrayList<State>(); // The clones of the states.
         for (State s : getStates()) {
-            newStates.add(new State(s.getName())); // Adding the new states based on the name of the old ones.
+            newStates.add(new State(s.getName())); // Adding the NEW states based on the name of the old ones.
+            // Based on the NAMES of the OLD states, NOT THEIR REFERENCES!!!
         }
         retVal.setStates(newStates); // Setting the new States in the new machine.
         // Setting the new machine's initial state.
         try {
             retVal.setInitialState(Utilities.getStateByName(newStates, getInitialState().getName()));
         } catch (StateNotFound e) {
-            // TODO: Is there something else todo here?
+            // Something went terribly wrong ...
             e.printStackTrace();
         }
 
@@ -512,6 +532,7 @@ public class Machine {
                 e.printStackTrace();
             }
         } // Transitions added, now comes the dicey part ...adding the correct transitions to the correct states ...
+        // ToDo: Future me: what de he mean by that last comment?
 
         retVal.setMachineTransitions(newTransitions);
         return retVal;

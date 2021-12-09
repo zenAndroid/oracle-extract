@@ -3,6 +3,9 @@ package app.oracleextractor.model.utils;
 import app.oracleextractor.model.State;
 import app.oracleextractor.model.Transition;
 
+/**
+ * I think this class was a mistake actually, will remove later ... TODO: REMOVE THIS INEFFICIENT WASTE OF SPACE
+ */
 public class StateTransition {
 
     State beforeState;

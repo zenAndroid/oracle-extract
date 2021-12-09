@@ -3,9 +3,7 @@ package app.oracleextractor.model.utils;
 import app.oracleextractor.model.Machine;
 import app.oracleextractor.model.State;
 import app.oracleextractor.model.Transition;
-import app.oracleextractor.model.exceptions.StateNotFound;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import app.oracleextractor.model.exceptions.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -82,9 +80,9 @@ public class Utilities {
         transitionListView.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((observableValue, transition, t1) -> {
-            chosenTransition[0] = t1;
-            tranLbl.setText(transitionListView.getSelectionModel().getSelectedItem().toString());
-        });
+                    chosenTransition[0] = t1;
+                    tranLbl.setText(transitionListView.getSelectionModel().getSelectedItem().toString());
+                });
 
         // Button Bar Setup
         ButtonBar buttonBar = new ButtonBar();
@@ -102,7 +100,7 @@ public class Utilities {
         borderPane.setCenter(centerDisplay);
         borderPane.setBottom(buttonBar);
 
-        Scene scene = new Scene(borderPane,600,400);
+        Scene scene = new Scene(borderPane, 600, 400);
         popUp.setScene(scene);
 
         popUp.showAndWait();
@@ -183,5 +181,66 @@ public class Utilities {
             throw new StateNotFound("State not found: getStateByName: " + name);
         }
         return retVal;
+    }
+
+
+    public static ArrayList<Trace> evalMachine(Machine mach, ArrayList<Character> input) throws StuckMachineException {
+        ArrayList<Trace> allPossibleTraces = new ArrayList<>();
+        if (input.isEmpty()) {
+            allPossibleTraces.add(mach.getMachineTrace());
+            return allPossibleTraces;
+        } else {
+            try {
+                mach.getMachineTrace().clear();
+                mach.setInputSequence(input);
+                ArrayList<Transition> transitions = mach.getCurrentState().getApplicableTransitions();
+                if (transitions.isEmpty()) {
+                    // If there are no transitions ... while there still is input ...
+                    throw new StuckMachineException("Stuck: No transitions, but pending input.",
+                            mach.getProducedOutput(), mach.getInputSequence());
+                    // Now i am Wondering if it even makes sense to have custom exceptions if
+                    // my exception don't really have any new state to hold ...
+                    // Well, i guess i might as well have them custom to know which state im in, but man i dont want
+                    // to cargo cult this, oh well.
+                }
+                for (Transition t : transitions) {
+                    Machine clone = mach.makeMachineCopy(); // Clone, has same data, same states, transitions, same I/O alphabet
+                    // clone.takeTransition(t);
+                    // Previous code /|\
+                    // Previous code  |
+                    // Previous code  | : Problem : the transition t belongs to mach, not clone,
+                    // so we have to find the equivalent transition in clone
+                    clone.takeTransition(Utilities.findTransition(t,clone));
+                    // didnt fucking work ...
+                    ArrayList<Trace> trace = evalMachine(clone, mach.getInputSequence());
+                    allPossibleTraces.addAll(trace);
+                }
+            } catch (BadInputException e) {
+                // This can happen if the initial input is malformed with the first invocation of this method
+                // but it shouldn't be a problem on later invocations
+                e.printStackTrace();
+            } catch (TransitionNotApplicable e) {
+                System.err.println(e.getMessage());
+                e.printStackTrace();
+            } catch (TransitionNotFound e){
+                e.printStackTrace();
+            }
+        }
+        return allPossibleTraces;
+    }
+
+    public static Transition findTransition(Transition t, Machine mach) throws TransitionNotFound {
+        for (Transition transition : mach.getMachineTransitions()) {
+            Boolean sameTrigger = transition.getTransitionTrigger().equals(t.getTransitionTrigger());
+            Boolean sameOutput = transition.getTransitionOutput().equals(t.getTransitionOutput());
+            Boolean sameSource = transition.getSourceState().getName()
+                    .equals(t.getSourceState().getName());
+            Boolean sameDest = transition.getDestinationState().getName()
+                    .equals(t.getDestinationState().getName());
+            if (sameTrigger && sameOutput && sameSource && sameDest) {
+                return transition;
+            }
+        }
+        throw new TransitionNotFound("No equivalent transition found !");
     }
 }

@@ -5,7 +5,6 @@ import app.oracleextractor.model.utils.Trace;
 import app.oracleextractor.model.utils.Utilities;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.Set;
 
@@ -100,9 +99,9 @@ public class Machine {
 
         // System.out.println(sample.toDot());
         try {
-            // simpleMachine.nonDeterministicConsume(Utilities.stringToList("ab"));
-            System.out.println(Utilities.evalMachine(simpleMachine, Utilities.stringToList("aba")).size());
-        } catch (/*BadInputException | */StuckMachineException e) {
+            simpleMachine.nonDeterministicConsume(Utilities.stringToList("ab"), false);
+            // System.out.println(Utilities.evalMachine(simpleMachine, Utilities.stringToList("aba")).size());
+        } catch (BadInputException e) {
             e.printStackTrace();
         }
     }
@@ -122,7 +121,6 @@ public class Machine {
 
 
     public void setStates(ArrayList<State> argStates) {
-        states = new ArrayList<>();
         for (State s : argStates) { // These state do not have a machine as an owner, so we set it for them.
             states.add(s);
         }
@@ -132,7 +130,6 @@ public class Machine {
 
 
     public void setStates(State... argStates) {
-        states = new ArrayList<>(); // Not sure this is even needed ... EDIT: It's crucial, let it be
         for (State s : argStates) {
             states.add(s);
         }
@@ -205,11 +202,18 @@ public class Machine {
 
     public void setMachineTransitions(ArrayList<Transition> transitions) {
         machineTransitions = transitions;
+        for (Transition t : transitions) {
+            t.sourceState().addOutgoingTransition(t);
+            t.destinationState().addIncomingTransition(t);
+        }
     }
 
     public void setMachineTransitions(Transition... transitions) {
-        machineTransitions = new ArrayList<>(Arrays.asList(transitions));
-        // Boy this syntax is ... interesting ... i think i almost prefer the old natural way ...
+        for (Transition t : transitions) {
+            machineTransitions.add(t);
+            t.sourceState().addOutgoingTransition(t);
+            t.destinationState().addIncomingTransition(t);
+        }
     }
 
 
@@ -217,20 +221,19 @@ public class Machine {
         return getPendingInput();
     }
 
-    public void nonDeterministicConsume(ArrayList<Character> input) throws BadInputException {
+    public void nonDeterministicConsume(ArrayList<Character> input, boolean graphicalContext) throws BadInputException {
         setInputSequence(input);
-        nonDeterministicConsume();
+        nonDeterministicConsume(graphicalContext);
     }
 
-    public void nonDeterministicConsume() {
+    public void nonDeterministicConsume(boolean graphicalContext) {
         machineTrace.clear(); // Clear the trace.
         while (isPending()) {
             try {
-                ArrayList<Transition> possibleTransitions = currentState
-                        .getApplicableTransitions(getNextInputToken(), machineTransitions);
-                Transition actualTransition;
-
-                actualTransition = chooseTransition(possibleTransitions, TranSelection_Policy.RANDOM_SELECTION);
+                ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions(getNextInputToken(), machineTransitions);
+                TranSelection_Policy selection_policy = graphicalContext ? TranSelection_Policy.INTERACTIVE_SELECTION
+                        : TranSelection_Policy.RANDOM_SELECTION;
+                Transition actualTransition = chooseTransition(possibleTransitions, selection_policy);
                 takeTransition(actualTransition);
             } catch (NoTransitionFound | TransitionNotApplicable e) {
                 // TODO: Is there something else todo here?
@@ -239,20 +242,35 @@ public class Machine {
         }
     }
 
-    public void nonDeterministicallyConsumeToken() throws NoPendingInput {
+    public void nonDeterministicallyConsumeToken(boolean graphicalContext) throws NoPendingInput {
         if (isPending()) {
-            ArrayList<Transition> possibleTransitions = currentState
-                    .getApplicableTransitions(getNextInputToken(), machineTransitions);
-            Transition actualTransition;
             try {
-                actualTransition = chooseTransition(possibleTransitions, TranSelection_Policy.INTERACTIVE_SELECTION);
+                ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions(getNextInputToken(), machineTransitions);
+                TranSelection_Policy selection_policy = graphicalContext ? TranSelection_Policy.INTERACTIVE_SELECTION
+                        : TranSelection_Policy.RANDOM_SELECTION;
+                Transition actualTransition = chooseTransition(possibleTransitions, selection_policy);
                 takeTransition(actualTransition);
             } catch (NoTransitionFound | TransitionNotApplicable e) {
                 // TODO: Is there something else todo here?
                 e.printStackTrace();
             }
         } else {
-            throw new NoPendingInput("Cannot consume token: machine not pending");
+            throw new NoPendingInput("Cannot consume token: machine not pending.");
+        }
+    }
+
+    public void nonDeterministicallyConsumeToken_UI() throws NoPendingInput {
+        if (isPending()) {
+            try {
+                ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions(getNextInputToken(), machineTransitions);
+                Transition actualTransition = chooseTransition(possibleTransitions, TranSelection_Policy.INTERACTIVE_SELECTION);
+                takeTransition(actualTransition);
+            } catch (NoTransitionFound | TransitionNotApplicable e) {
+                // TODO: Is there something else todo here?
+                e.printStackTrace();
+            }
+        } else {
+            throw new NoPendingInput("Cannot consume token: machine not pending.");
         }
     }
 

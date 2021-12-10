@@ -89,7 +89,7 @@ public class DebugController implements Initializable {
 
         stepMachineButton.setOnAction(actionEvent -> {
             try {
-                machineOfInterest.nonDeterministicallyConsumeToken();
+                machineOfInterest.nonDeterministicallyConsumeToken(true);
                 log(LOGTYPE.STEP_ENTRY);
                 updateUI();
             } catch (NoPendingInput e) {
@@ -100,7 +100,7 @@ public class DebugController implements Initializable {
         });
 
         runMachineButton.setOnAction(actionEvent -> {
-            machineOfInterest.nonDeterministicConsume();
+            machineOfInterest.nonDeterministicConsume(true);
             log(LOGTYPE.RUN_ENTRY);
             updateUI();
         });

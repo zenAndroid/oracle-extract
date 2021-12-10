@@ -4,9 +4,7 @@ import app.oracleextractor.model.exceptions.*;
 import app.oracleextractor.model.utils.Trace;
 import app.oracleextractor.model.utils.Utilities;
 
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class Machine {
 
@@ -121,7 +119,7 @@ public class Machine {
 
 
     public void setStates(ArrayList<State> argStates) {
-        for (State s : argStates) { // These state do not have a machine as an owner, so we set it for them.
+        for (State s : argStates) {
             states.add(s);
         }
         // TODO: Test this functionality!
@@ -201,19 +199,15 @@ public class Machine {
     }
 
     public void setMachineTransitions(ArrayList<Transition> transitions) {
-        machineTransitions = transitions;
         for (Transition t : transitions) {
+            machineTransitions.add(t);
             t.sourceState().addOutgoingTransition(t);
             t.destinationState().addIncomingTransition(t);
         }
     }
 
     public void setMachineTransitions(Transition... transitions) {
-        for (Transition t : transitions) {
-            machineTransitions.add(t);
-            t.sourceState().addOutgoingTransition(t);
-            t.destinationState().addIncomingTransition(t);
-        }
+        setMachineTransitions(new ArrayList<>(Arrays.asList(transitions)));
     }
 
 
@@ -352,7 +346,7 @@ public class Machine {
         b.append("    INIT -> ").append(getInitialState().stateName()).append(";\n");
         ArrayList<State> machineStates = getStates();
         for (State s : machineStates) {
-            var stateTranses = getTransitionsFromState(s); // The transintions that come from this state.
+            var stateTranses = s.outGoing(); // The transintions that come from this state.
             for (Transition t : stateTranses) {
                 b.append("    ").append(s.stateName()).append(" -> ").append(t.destinationState().stateName()).append(" ");
                 b.append("[label=\"").append(t.transitionTrigger())
@@ -363,17 +357,6 @@ public class Machine {
             }
         }
         return b.append("}\n").toString();
-    }
-
-    private ArrayList<Transition> getTransitionsFromState(State s) {
-        ArrayList<Transition> transitions = new ArrayList<>();
-        for (Transition t : machineTransitions) {
-            if (t.sourceState().equals(s)) {
-                // This transition comes from this state, so OK to add it
-                transitions.add(t);
-            }
-        }
-        return transitions;
     }
 
     /**

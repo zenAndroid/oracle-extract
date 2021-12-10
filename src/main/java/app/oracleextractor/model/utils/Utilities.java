@@ -189,7 +189,7 @@ public class Utilities {
                 mach.getMachineTrace().clear();
                 mach.setInputSequence(input);
                 ArrayList<Transition> transitions = mach.getCurrentState()
-                        .getApplicableTransitions(mach.getNextInputToken(), mach.getMachineTransitions());
+                        .getApplicableTransitions(mach.getNextInputToken());
                 if (transitions.isEmpty()) {
                     throw new StuckMachineException("Stuck: No transitions, but pending input.",
                             mach.getProducedOutput(), mach.getInputSequence());

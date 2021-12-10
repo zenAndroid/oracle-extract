@@ -22,10 +22,10 @@ public record State(String stateName, ArrayList<Transition> outGoing, ArrayList<
 
     }
 
-    public ArrayList<Transition> getApplicableTransitions(Character trigger, ArrayList<Transition> targetTransitions) {
+    public ArrayList<Transition> getApplicableTransitions(Character trigger) {
 
         var applicableTransitions = new ArrayList<Transition>(); // Possible transitions from this state-trigger combo
-        for (Transition t : targetTransitions) { // For EVERY transition in this machine ...
+        for (Transition t : outGoing) { // For EVERY transition in this machine ...
             if (t.sourceState().equals(this) && t.isValid() && t.isTriggeredBy(trigger)) {
                 // Check if the transition is valid && is the correct response to this character ...
                 // ... if so, add it to the list of possible transitions

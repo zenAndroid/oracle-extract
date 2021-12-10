@@ -99,7 +99,7 @@ public class Machine {
 
         // System.out.println(sample.toDot());
         try {
-            simpleMachine.nonDeterministicConsume(Utilities.stringToList("ab"), false);
+            sample.nonDeterministicConsume(Utilities.stringToList("abbbbba"), false);
             // System.out.println(Utilities.evalMachine(simpleMachine, Utilities.stringToList("aba")).size());
         } catch (BadInputException e) {
             e.printStackTrace();
@@ -230,7 +230,7 @@ public class Machine {
         machineTrace.clear(); // Clear the trace.
         while (isPending()) {
             try {
-                ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions(getNextInputToken(), machineTransitions);
+                ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions(getNextInputToken());
                 TranSelection_Policy selection_policy = graphicalContext ? TranSelection_Policy.INTERACTIVE_SELECTION
                         : TranSelection_Policy.RANDOM_SELECTION;
                 Transition actualTransition = chooseTransition(possibleTransitions, selection_policy);
@@ -245,25 +245,10 @@ public class Machine {
     public void nonDeterministicallyConsumeToken(boolean graphicalContext) throws NoPendingInput {
         if (isPending()) {
             try {
-                ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions(getNextInputToken(), machineTransitions);
+                ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions(getNextInputToken());
                 TranSelection_Policy selection_policy = graphicalContext ? TranSelection_Policy.INTERACTIVE_SELECTION
                         : TranSelection_Policy.RANDOM_SELECTION;
                 Transition actualTransition = chooseTransition(possibleTransitions, selection_policy);
-                takeTransition(actualTransition);
-            } catch (NoTransitionFound | TransitionNotApplicable e) {
-                // TODO: Is there something else todo here?
-                e.printStackTrace();
-            }
-        } else {
-            throw new NoPendingInput("Cannot consume token: machine not pending.");
-        }
-    }
-
-    public void nonDeterministicallyConsumeToken_UI() throws NoPendingInput {
-        if (isPending()) {
-            try {
-                ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions(getNextInputToken(), machineTransitions);
-                Transition actualTransition = chooseTransition(possibleTransitions, TranSelection_Policy.INTERACTIVE_SELECTION);
                 takeTransition(actualTransition);
             } catch (NoTransitionFound | TransitionNotApplicable e) {
                 // TODO: Is there something else todo here?

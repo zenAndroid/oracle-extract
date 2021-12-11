@@ -4,7 +4,10 @@ import app.oracleextractor.model.exceptions.*;
 import app.oracleextractor.model.utils.Trace;
 import app.oracleextractor.model.utils.Utilities;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.Set;
 
 public class Machine {
 
@@ -77,7 +80,7 @@ public class Machine {
 
     public static void main(String[] args) {
         // Creating the states;
-        Machine sample = Utilities.getDefaultMachine();
+        // Machine sample = Utilities.getDefaultMachine();
         Machine simpleMachine = new Machine();
         State one = State.getState("1");
         State two = State.getState("2");
@@ -95,13 +98,19 @@ public class Machine {
 
         simpleMachine.setMachineTransitions(temp, temp1, temp2, temp3);
 
-        // System.out.println(sample.toDot());
         try {
-            sample.nonDeterministicConsume(Utilities.stringToList("abbbbba"), false);
-            // System.out.println(Utilities.evalMachine(simpleMachine, Utilities.stringToList("aba")).size());
+            simpleMachine.setInputSequence(Utilities.stringToList("abab"));
         } catch (BadInputException e) {
             e.printStackTrace();
         }
+
+        // try {
+        //     System.out.println("Size of the trace: " + Utilities.evalMachine(simpleMachine, Utilities.stringToList("ab")).size());
+        // } catch (StuckMachineException e) {
+        //     e.printStackTrace();
+        // }
+        System.out.println("Hello");
+        simpleMachine.nonDeterministicConsume(false);
     }
 
     public Trace getMachineTrace() {
@@ -112,31 +121,23 @@ public class Machine {
         this.machineTrace = machineTrace;
     }
 
-
     public ArrayList<State> getStates() {
         return states;
     }
 
-
     public void setStates(ArrayList<State> argStates) {
-        for (State s : argStates) {
-            states.add(s);
-        }
+        states.addAll(argStates);
         // TODO: Test this functionality!
         //  And I assume people that will come after me will (hopefully) make a proper testing suite.
     }
 
-
     public void setStates(State... argStates) {
-        for (State s : argStates) {
-            states.add(s);
-        }
+        states.addAll(Arrays.asList(argStates));
     }
 
     public State getInitialState() {
         return initialState;
     }
-
 
     public void setInitialState(State argInitialState) {
         initialState = argInitialState;
@@ -154,7 +155,6 @@ public class Machine {
     public ArrayList<Character> getInputSequence() {
         return inputSequence;
     }
-
 
     public void setInputSequence(ArrayList<Character> argInputSequence) throws BadInputException {
         if (inputAlphabet.containsAll(argInputSequence)) {
@@ -194,6 +194,10 @@ public class Machine {
         return lastOutput;
     }
 
+    public void setLastOutput(Character lastOutput) {
+        this.lastOutput = lastOutput;
+    }
+
     public ArrayList<Transition> getMachineTransitions() {
         return machineTransitions;
     }
@@ -210,7 +214,6 @@ public class Machine {
         setMachineTransitions(new ArrayList<>(Arrays.asList(transitions)));
     }
 
-
     public Boolean isPending() {
         return getPendingInput();
     }
@@ -224,7 +227,7 @@ public class Machine {
         machineTrace.clear(); // Clear the trace.
         while (isPending()) {
             try {
-                ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions(getNextInputToken());
+                ArrayList<Transition> possibleTransitions = Utilities.getApplicableTransitions(currentState, getNextInputToken());
                 TranSelection_Policy selection_policy = graphicalContext ? TranSelection_Policy.INTERACTIVE_SELECTION
                         : TranSelection_Policy.RANDOM_SELECTION;
                 Transition actualTransition = chooseTransition(possibleTransitions, selection_policy);
@@ -239,7 +242,7 @@ public class Machine {
     public void nonDeterministicallyConsumeToken(boolean graphicalContext) throws NoPendingInput {
         if (isPending()) {
             try {
-                ArrayList<Transition> possibleTransitions = currentState.getApplicableTransitions(getNextInputToken());
+                ArrayList<Transition> possibleTransitions = Utilities.getApplicableTransitions(currentState, getNextInputToken());
                 TranSelection_Policy selection_policy = graphicalContext ? TranSelection_Policy.INTERACTIVE_SELECTION
                         : TranSelection_Policy.RANDOM_SELECTION;
                 Transition actualTransition = chooseTransition(possibleTransitions, selection_policy);
@@ -253,14 +256,13 @@ public class Machine {
         }
     }
 
-
     private Transition chooseTransition(ArrayList<Transition> possibleTransitions,
                                         TranSelection_Policy selectionPolicy) throws NoTransitionFound {
         Random randomStream = new Random();
         Transition chosenTransition = null;
         if (possibleTransitions.isEmpty()) {
-            throw new NoTransitionFound("No transitions found from the current state, State:"
-                    + currentState.stateName() + " possibleTransitions: " + possibleTransitions);
+            throw new NoTransitionFound("No transitions found from the current state, State: "
+                    + currentState.stateName() + ", possibleTransitions: " + possibleTransitions);
         } else if (possibleTransitions.size() == 1) {
             return possibleTransitions.get(0);
         } else {
@@ -272,7 +274,6 @@ public class Machine {
         }
         return chosenTransition;
     }
-
 
     public Character getNextInputToken() {
         // Removes also returns the removed element, so we can use it to achieve two actions;
@@ -287,6 +288,10 @@ public class Machine {
 
     public ArrayList<Character> getProducedOutput() {
         return producedOutput;
+    }
+
+    public void setProducedOutput(ArrayList<Character> producedOutput) {
+        this.producedOutput = producedOutput;
     }
 
     /**
@@ -368,27 +373,19 @@ public class Machine {
      * @return <code>retval</code>, a clone of this machine.
      */
     public Machine makeMachineCopy() {
-        var retVal = new Machine(); // The new clone of this machine.
-        retVal.setInputAlphabet(getInputAlphabet()); // Yeah yeah
-        retVal.setOutputAlphabet(getOutputAlphabet()); // Yeah yeah
-        var newStates = new ArrayList<State>(); // The clones of the states.
+        var retVal = new Machine();
+        retVal.setInputAlphabet(getInputAlphabet());
+        retVal.setOutputAlphabet(getOutputAlphabet());
+        var newStates = new ArrayList<State>();
         for (State s : getStates()) {
-            newStates.add(State.getState(s.stateName())); // Adding the NEW states based on the name of the old ones.
-            // Based on the NAMES of the OLD states, NOT THEIR REFERENCES!!!
+            newStates.add(State.getState(s.stateName()));
         }
-        retVal.setStates(newStates); // Setting the new States in the new machine.
-        // Setting the new machine's initial state.
+        retVal.setStates(newStates);
         try {
             retVal.setInitialState(Utilities.getStateByName(newStates, getInitialState().stateName()));
-            retVal.setCurrentState(Utilities.getStateByName(newStates, getCurrentState().stateName()));
         } catch (StateNotFound e) {
-            // Something went terribly wrong ...
             e.printStackTrace();
         }
-
-        // Now we will create the transitions, this might get hairy, but i will try to
-        // compactify the operations by making use of the constructors that allow me to set the source and destinaton
-        // states
 
         var newTransitions = new ArrayList<Transition>();
         for (Transition t : machineTransitions) {
@@ -401,27 +398,56 @@ public class Machine {
                 // Todo: some thing to do?
                 e.printStackTrace();
             }
-        } // Transitions added, now comes the dicey part ...adding the correct transitions to the correct states ...
-        // ToDo: Future me: what de he mean by that last comment?
-
+        }
         retVal.setMachineTransitions(newTransitions);
         return retVal;
     }
 
-    @Override
-    public String toString() {
-        return "Machine{" +
-                "states=" + states +
-                ", initialState=" + initialState +
-                ", currentState=" + currentState +
-                ", inputSequence=" + inputSequence +
-                ", producedOutput=" + producedOutput +
-                ", lastOutput=" + lastOutput +
-                ", inputAlphabet=" + inputAlphabet +
-                ", outputAlphabet=" + outputAlphabet +
-                ", pendingInput=" + pendingInput + '\n' +
-                ", machineTransitions=" + machineTransitions +
-                '}';
+    public Machine makeCurrentMachineCopy() throws BadInputException, StateNotFound {
+        Machine retVal = new Machine();
+        // private ArrayList<State> states;
+        // private State initialState;
+        // private State currentState;
+        // private ArrayList<Character> inputSequence;
+        // private ArrayList<Character> producedOutput;
+        // private Character lastOutput;
+        // private Set<Character> inputAlphabet;
+        // private Set<Character> outputAlphabet;
+        // private Boolean pendingInput;
+        // private ArrayList<Transition> machineTransitions;
+        // private Trace machineTrace;
+        ArrayList<State> newMachineStates = new ArrayList<>(states.size());
+        for (State state : states) {
+            newMachineStates.add(State.getState(state.stateName()));
+        }
+        ArrayList<Transition> newMachineTransitions = new ArrayList<>();
+        for (Transition t : machineTransitions) {
+            newMachineTransitions.add(Transition.getInstance(t.transitionTrigger(), t.transitionOutput(),
+                    Utilities.getStateByName(newMachineStates, t.sourceState().stateName()),
+                    Utilities.getStateByName(newMachineStates, t.destinationState().stateName())));
+        }
+        State newMachineInitialState = Utilities.getStateByName(newMachineStates, getInitialState().stateName());
+        State newMachineCurrentState = newMachineInitialState;
+        ArrayList<Character> newMachineInputSequence = new ArrayList<>(inputSequence);
+        ArrayList<Character> newMachineProducedOutput = new ArrayList<>(producedOutput);
+        Character newMachinelastOutput = lastOutput;
+        Set<Character> newMachineInputAlphabet = inputAlphabet;
+        Set<Character> newMachineOutputAlphabet = outputAlphabet;
+        Boolean newMachinePendingInput = pendingInput;
+        Trace newMachineTrace = new Trace(machineTrace);
+        retVal.setInputAlphabet(newMachineInputAlphabet);
+        retVal.setOutputAlphabet(newMachineOutputAlphabet);
+        retVal.setStates(newMachineStates);
+        retVal.setInitialState(newMachineInitialState);
+        retVal.setCurrentState(newMachineCurrentState);
+        retVal.setInputSequence(newMachineInputSequence);
+        retVal.setProducedOutput(newMachineProducedOutput);
+        retVal.setLastOutput(newMachinelastOutput);
+        retVal.setPendingInput(newMachinePendingInput);
+        retVal.setMachineTransitions(newMachineTransitions);
+        retVal.setMachineTrace(newMachineTrace);
+
+        return retVal;
     }
 
     private enum TranSelection_Policy {

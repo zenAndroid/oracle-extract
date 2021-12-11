@@ -49,7 +49,7 @@ public class DebugController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeUIElements();
-        machineOfInterest = Utilities.getDefaultMachine();
+        machineOfInterest = Utilities.getAltMachine();
         cloneOfInterest = machineOfInterest.makeMachineCopy();
         updateMachineView(machineOfInterest);
     }
@@ -108,6 +108,7 @@ public class DebugController implements Initializable {
         resetMachineButton.setOnAction(actionEvent -> {
             machineOfInterest = cloneOfInterest.makeMachineCopy();
             log(LOGTYPE.RESET_MACHINE_ENTRY);
+            buttonBar.setDisable(true); // disable the button bar after resetting the machine
             updateUI();
         });
 

@@ -11,7 +11,8 @@ public record Transition(Character transitionTrigger, Character transitionOutput
                                          State sourceState, State destinationState) {
         return new Transition(transitionTrigger, transitionOutput,
                 sourceState, destinationState,
-                new ToggleableBoolean(false), new ToggleableBoolean(true));
+                /* wasVisited set to its default initial value: */ new ToggleableBoolean(false),
+                /* transitionValid set to its default initial value: */ new ToggleableBoolean(true));
     }
 
     public Boolean getTransitionValid() {

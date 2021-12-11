@@ -1,13 +1,13 @@
 package app.oracleextractor.model.utils;
 
 public class ToggleableBoolean {
-    Boolean value;
+    boolean value;
 
     public ToggleableBoolean(Boolean value) {
         this.value = value;
     }
 
-    public Boolean getValue() {
+    public boolean getValue() {
         return value;
     }
 

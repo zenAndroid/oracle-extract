@@ -11,6 +11,13 @@ public class Trace {
         theTrace = new ArrayList<>();
     }
 
+    public Trace(Trace oldTrace){
+        theTrace = new ArrayList<>();
+        for (Transition t: oldTrace.theTrace){
+            addTransition(t);
+        }
+    }
+
     public void addTransition(Transition t) {
         theTrace.add(t);
     }
@@ -18,6 +25,11 @@ public class Trace {
     public Transition getLastChange() {
         int lastElementIndex = theTrace.size() - 1;
         return theTrace.get(lastElementIndex);
+    }
+
+    public Character getLastOutput(){
+        // TODO
+        return null;
     }
 
     public void clear() {

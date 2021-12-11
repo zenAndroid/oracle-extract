@@ -6,6 +6,7 @@ public class StuckMachineException extends Exception {
 
     ArrayList<Character> producedOutput; // The output produced by the machine before it got stuck.
     ArrayList<Character> remainingInput; // The input that remains unprocessed by the machine.
+
     public StuckMachineException() {
     }
 
@@ -13,5 +14,9 @@ public class StuckMachineException extends Exception {
         super(message);
         this.producedOutput = producedOutput;
         this.remainingInput = remainingInput;
+    }
+
+    public StuckMachineException(String msg) {
+        super(msg);
     }
 }

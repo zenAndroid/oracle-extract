@@ -3,7 +3,10 @@ package app.oracleextractor.model.utils;
 import app.oracleextractor.model.Machine;
 import app.oracleextractor.model.State;
 import app.oracleextractor.model.Transition;
-import app.oracleextractor.model.exceptions.*;
+import app.oracleextractor.model.exceptions.NoTransitionFound;
+import app.oracleextractor.model.exceptions.StateNotFound;
+import app.oracleextractor.model.exceptions.StuckMachineException;
+import app.oracleextractor.model.exceptions.TransitionNotFound;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -159,6 +162,26 @@ public class Utilities {
         return debug;
     }
 
+    public static Machine getAltMachine() {
+        Machine simpleMachine = new Machine();
+        State one = State.getState("1");
+        State two = State.getState("2");
+        Transition temp = Transition.getInstance('a', '1', one, two);
+        Transition temp1 = Transition.getInstance('a', '2', one, two);
+        Transition temp2 = Transition.getInstance('b', '2', two, one);
+        Transition temp3 = Transition.getInstance('b', '1', two, one);
+        simpleMachine.setInitialState(one);
+
+        simpleMachine.setInputAlphabet(Set.of('a', 'b'));
+
+        simpleMachine.setOutputAlphabet(Set.of('1', '2'));
+
+        simpleMachine.setStates(one, two);
+
+        simpleMachine.setMachineTransitions(temp, temp1, temp2, temp3);
+        return simpleMachine;
+    }
+
     /**
      * Method for getting a state given its name and and array of states.
      *
@@ -179,37 +202,30 @@ public class Utilities {
         return retVal;
     }
 
-    public static ArrayList<Trace> evalMachine(Machine mach, ArrayList<Character> input) throws StuckMachineException {
+    public static ArrayList<Trace> evalMachine(Machine mach, ArrayList<Character> input) {
+        mach.getMachineTrace().clear();
+        return evalMachineDriver(mach, input);
+    }
+
+    public static ArrayList<Trace> evalMachineDriver(Machine mach, ArrayList<Character> input) {
         ArrayList<Trace> allPossibleTraces = new ArrayList<>();
         if (input.isEmpty()) {
             allPossibleTraces.add(mach.getMachineTrace());
             return allPossibleTraces;
         } else {
             try {
-                mach.getMachineTrace().clear();
                 mach.setInputSequence(input);
-                ArrayList<Transition> transitions = mach.getCurrentState()
-                        .getApplicableTransitions(mach.getNextInputToken());
-                if (transitions.isEmpty()) {
-                    throw new StuckMachineException("Stuck: No transitions, but pending input.",
-                            mach.getProducedOutput(), mach.getInputSequence());
-                }
+                ArrayList<Transition> transitions = Utilities.getApplicableTransitions(mach.getCurrentState()
+                        , mach.getNextInputToken());
                 for (Transition t : transitions) {
-                    Machine clone = mach.makeMachineCopy(); // Clone, has same data, same states, transitions, same I/O alphabet
-                    // clone.takeTransition(t);
-                    // Previous code /|\
-                    // Previous code  |
-                    // Previous code  | : Problem : the transition t belongs to mach, not clone,
-                    // so we have to find the equivalent transition in clone
+                    Machine clone = mach.makeCurrentMachineCopy();
                     clone.takeTransition(Utilities.findTransition(t, clone));
                     // didnt fucking work ...
                     ArrayList<Trace> trace = evalMachine(clone, mach.getInputSequence());
                     allPossibleTraces.addAll(trace);
                 }
-            } catch (BadInputException | TransitionNotFound | TransitionNotApplicable e) {
-                // This can happen if the initial input is malformed with the first invocation of this method
-                // but it shouldn't be a problem on later invocations
-                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace(); // ToDo: Too general, at least specify, even if they have the same catch block.
             }
         }
         return allPossibleTraces;
@@ -228,6 +244,25 @@ public class Utilities {
             }
         }
         throw new TransitionNotFound("No equivalent transition found !");
+    }
+
+    public static ArrayList<Transition> getApplicableTransitions(State state, Character trigger) throws NoTransitionFound {
+
+        var applicableTransitions = new ArrayList<Transition>(); // Possible transitions from this state-trigger combo
+        for (Transition t : state.outGoing()) {
+            if (t.sourceState().equals(state) && t.isValid() && t.isTriggeredBy(trigger)) {
+                // Check if the transition is valid && is the correct response to this character ...
+                // ... if so, add it to the list of possible transitions
+                applicableTransitions.add(t);
+            }
+        }
+        if (applicableTransitions.isEmpty()) {
+            throw new NoTransitionFound("No transition found from this state. State: "
+                    + state + ", trigger: " + trigger + ".");
+        } else {
+            // At this stage we have the collection of transitions that can be taken from here on out, we return this for now
+            return applicableTransitions;
+        }
     }
 
     public static String getInputAsString(Machine argMach) {

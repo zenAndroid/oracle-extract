@@ -16,7 +16,7 @@ public class StuckMachineException extends Exception {
         this.remainingInput = remainingInput;
     }
 
-    public StuckMachineException(String msg) {
-        super(msg);
+    public StuckMachineException(String message) {
+        super(message);
     }
 }

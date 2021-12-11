@@ -16,7 +16,6 @@ public class Machine {
     private State currentState;
     private ArrayList<Character> inputSequence;
     private ArrayList<Character> producedOutput;
-    private Character lastOutput;
     private Set<Character> inputAlphabet;
     private Set<Character> outputAlphabet;
     private Boolean pendingInput;
@@ -190,12 +189,8 @@ public class Machine {
         pendingInput = argPendingInput;
     }
 
-    public Character getLastOutput() {
-        return lastOutput;
-    }
-
-    public void setLastOutput(Character lastOutput) {
-        this.lastOutput = lastOutput;
+    public Character getLastOutput() throws NoLastChange {
+        return machineTrace.getLastOutput();
     }
 
     public ArrayList<Transition> getMachineTransitions() {
@@ -252,7 +247,7 @@ public class Machine {
                 e.printStackTrace();
             }
         } else {
-            throw new NoPendingInput("Cannot consume token: machine not pending.");
+            throw  new NoPendingInput("Cannot consume token: machine not pending.");
         }
     }
 
@@ -331,7 +326,6 @@ public class Machine {
      * @param sourceTransition The output of the machine, given its global state.
      */
     public void processOutput(Character sourceTransition) {
-        lastOutput = sourceTransition; // This is the lastoutput
         producedOutput.add(sourceTransition); // Add the output to the list of outputs we've outputted.
         System.out.println(sourceTransition); // Print it; todo: this is bad and hardcoded, is there even a fix?
         // The issue here is that a machine might do something else with this output *other* than outputting it,
@@ -430,7 +424,6 @@ public class Machine {
         State newMachineCurrentState = newMachineInitialState;
         ArrayList<Character> newMachineInputSequence = new ArrayList<>(inputSequence);
         ArrayList<Character> newMachineProducedOutput = new ArrayList<>(producedOutput);
-        Character newMachinelastOutput = lastOutput;
         Set<Character> newMachineInputAlphabet = inputAlphabet;
         Set<Character> newMachineOutputAlphabet = outputAlphabet;
         Boolean newMachinePendingInput = pendingInput;
@@ -442,7 +435,6 @@ public class Machine {
         retVal.setCurrentState(newMachineCurrentState);
         retVal.setInputSequence(newMachineInputSequence);
         retVal.setProducedOutput(newMachineProducedOutput);
-        retVal.setLastOutput(newMachinelastOutput);
         retVal.setPendingInput(newMachinePendingInput);
         retVal.setMachineTransitions(newMachineTransitions);
         retVal.setMachineTrace(newMachineTrace);

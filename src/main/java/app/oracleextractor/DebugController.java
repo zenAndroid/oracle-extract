@@ -2,6 +2,7 @@ package app.oracleextractor;
 
 import app.oracleextractor.model.Machine;
 import app.oracleextractor.model.exceptions.BadInputException;
+import app.oracleextractor.model.exceptions.NoLastChange;
 import app.oracleextractor.model.exceptions.NoPendingInput;
 import app.oracleextractor.model.utils.Utilities;
 import javafx.fxml.FXML;
@@ -93,7 +94,6 @@ public class DebugController implements Initializable {
                 log(LOGTYPE.STEP_ENTRY);
                 updateUI();
             } catch (NoPendingInput e) {
-                e.printStackTrace();
                 Utilities.getPopup("No tokens left", "There are no tokens left to consume").showAndWait();
             }
 
@@ -137,7 +137,13 @@ public class DebugController implements Initializable {
         String newContent = "";
         switch (type) {
             case NEW_INPUT_ENTRY -> newContent = "New input to the machine: " + Utilities.getInputAsString(machineOfInterest) + '\n';
-            case STEP_ENTRY -> newContent = machineOfInterest.getMachineTrace().getLastChange().toString() + '\n';
+            case STEP_ENTRY -> {
+                try {
+                    newContent = machineOfInterest.getMachineTrace().getLastChange().toString() + '\n';
+                } catch (NoLastChange e){
+                    newContent = "";
+                }
+            }
             case RUN_ENTRY -> newContent = "Complete machine execution.\n" + machineOfInterest.getMachineTrace().toString() + '\n';
             case RESET_MACHINE_ENTRY -> newContent = "Machine reset to initial state.\n";
         }
@@ -182,8 +188,10 @@ public class DebugController implements Initializable {
     public void updateUI() {
         lblInput.setText("Input : " + Utilities.getInputAsString(machineOfInterest));
         lblCurrentState.setText("Current State: " + machineOfInterest.getCurrentState().stateName());
-        if (machineOfInterest.getLastOutput() != null) {
+        try {
             lblLastOutput.setText("Last Output: " + machineOfInterest.getLastOutput());
+        } catch (NoLastChange e){
+            lblLastOutput.setText("Last Output: NONE");
         }
         lblOutput.setText("Output accumulator: " + machineOfInterest.getProducedOutput());
         updateMachineView(machineOfInterest);

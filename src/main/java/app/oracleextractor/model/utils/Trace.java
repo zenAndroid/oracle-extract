@@ -1,6 +1,7 @@
 package app.oracleextractor.model.utils;
 
 import app.oracleextractor.model.Transition;
+import app.oracleextractor.model.exceptions.NoLastChange;
 
 import java.util.ArrayList;
 
@@ -12,7 +13,7 @@ public class Trace {
     }
 
     public Trace(Trace oldTrace){
-        theTrace = new ArrayList<>();
+        super();
         for (Transition t: oldTrace.theTrace){
             addTransition(t);
         }
@@ -22,14 +23,18 @@ public class Trace {
         theTrace.add(t);
     }
 
-    public Transition getLastChange() {
+    public Transition getLastChange() throws NoLastChange {
         int lastElementIndex = theTrace.size() - 1;
-        return theTrace.get(lastElementIndex);
+        if(lastElementIndex != -1) {
+            return theTrace.get(lastElementIndex);
+        }
+        else {
+            throw new NoLastChange("Fresh execution: there is no transition in the trace.");
+        }
     }
 
-    public Character getLastOutput(){
-        // TODO
-        return null;
+    public Character getLastOutput() throws NoLastChange {
+        return getLastChange().transitionOutput();
     }
 
     public void clear() {

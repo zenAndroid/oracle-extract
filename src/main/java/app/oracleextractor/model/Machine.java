@@ -98,16 +98,12 @@ public class Machine {
         simpleMachine.setMachineTransitions(temp, temp1, temp2, temp3);
 
         try {
-            simpleMachine.setInputSequence(Utilities.stringToList("abab"));
+            simpleMachine.setInputSequence(Utilities.stringToList("ab"));
         } catch (BadInputException e) {
             e.printStackTrace();
         }
 
-        // try {
-        //     System.out.println("Size of the trace: " + Utilities.evalMachine(simpleMachine, Utilities.stringToList("ab")).size());
-        // } catch (StuckMachineException e) {
-        //     e.printStackTrace();
-        // }
+        // System.out.println("Size of the trace: " + Utilities.evalMachine(simpleMachine, Utilities.stringToList("ab")).size());
         System.out.println("Hello");
         simpleMachine.nonDeterministicConsume(false);
     }
@@ -421,7 +417,7 @@ public class Machine {
                     Utilities.getStateByName(newMachineStates, t.destinationState().stateName())));
         }
         State newMachineInitialState = Utilities.getStateByName(newMachineStates, getInitialState().stateName());
-        State newMachineCurrentState = newMachineInitialState;
+        State newMachineCurrentState = Utilities.getStateByName(newMachineStates, getCurrentState().stateName());
         ArrayList<Character> newMachineInputSequence = new ArrayList<>(inputSequence);
         ArrayList<Character> newMachineProducedOutput = new ArrayList<>(producedOutput);
         Set<Character> newMachineInputAlphabet = inputAlphabet;
@@ -435,7 +431,9 @@ public class Machine {
         retVal.setCurrentState(newMachineCurrentState);
         retVal.setInputSequence(newMachineInputSequence);
         retVal.setProducedOutput(newMachineProducedOutput);
-        retVal.setPendingInput(newMachinePendingInput);
+        // I will comment this out, and see if it changes anything.
+        // Should be ok, since the pending input is set automagically with the set input sequence.
+        // retVal.setPendingInput(newMachinePendingInput);
         retVal.setMachineTransitions(newMachineTransitions);
         retVal.setMachineTrace(newMachineTrace);
 

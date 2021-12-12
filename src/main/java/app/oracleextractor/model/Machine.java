@@ -80,32 +80,11 @@ public class Machine {
     public static void main(String[] args) {
         // Creating the states;
         // Machine sample = Utilities.getDefaultMachine();
-        Machine simpleMachine = new Machine();
-        State one = State.getState("1");
-        State two = State.getState("2");
-        Transition temp = Transition.getInstance('a', '1', one, two);
-        Transition temp1 = Transition.getInstance('a', '2', one, two);
-        Transition temp2 = Transition.getInstance('b', '2', two, one);
-        Transition temp3 = Transition.getInstance('b', '1', two, one);
-        simpleMachine.setInitialState(one);
+        Machine simpleMachine = Utilities.getAltMachine();
 
-        simpleMachine.setInputAlphabet(Set.of('a', 'b'));
-
-        simpleMachine.setOutputAlphabet(Set.of('1', '2'));
-
-        simpleMachine.setStates(one, two);
-
-        simpleMachine.setMachineTransitions(temp, temp1, temp2, temp3);
-
-        try {
-            simpleMachine.setInputSequence(Utilities.stringToList("ab"));
-        } catch (BadInputException e) {
-            e.printStackTrace();
-        }
-
-        // System.out.println("Size of the trace: " + Utilities.evalMachine(simpleMachine, Utilities.stringToList("ab")).size());
-        System.out.println("Hello");
-        simpleMachine.nonDeterministicConsume(false);
+        System.out.println("Size of the trace: " + Utilities.evalMachine(simpleMachine, Utilities.stringToList("a")).size());
+        // System.out.println("Hello");
+        // simpleMachine.nonDeterministicConsume(false);
     }
 
     public Trace getMachineTrace() {
@@ -341,7 +320,7 @@ public class Machine {
         b.append("    INIT -> ").append(getInitialState().stateName()).append(";\n");
         ArrayList<State> machineStates = getStates();
         for (State s : machineStates) {
-            var stateTranses = s.outGoing(); // The transintions that come from this state.
+            var stateTranses = s.outGoing(); // The transitions that come from this state.
             for (Transition t : stateTranses) {
                 b.append("    ").append(s.stateName()).append(" -> ").append(t.destinationState().stateName()).append(" ");
                 b.append("[label=\"").append(t.transitionTrigger())

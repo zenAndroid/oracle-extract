@@ -13,7 +13,7 @@ public class Trace {
     }
 
     public Trace(Trace oldTrace){
-        super();
+        theTrace = new ArrayList<>();
         for (Transition t: oldTrace.theTrace){
             addTransition(t);
         }

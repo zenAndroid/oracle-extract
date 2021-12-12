@@ -214,7 +214,7 @@ public class Utilities {
             return allPossibleTraces;
         } else {
             try {
-                argMach.setInputSequence(input);
+                argMach.setInputSequence(new ArrayList<>(input));
                 ArrayList<Transition> transitions = Utilities.getApplicableTransitions(argMach.getCurrentState()
                         , argMach.getNextInputToken());
                 for (Transition t : transitions) {

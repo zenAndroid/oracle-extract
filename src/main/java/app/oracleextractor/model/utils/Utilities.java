@@ -202,26 +202,25 @@ public class Utilities {
         return retVal;
     }
 
-    public static ArrayList<Trace> evalMachine(Machine mach, ArrayList<Character> input) {
-        mach.getMachineTrace().clear();
-        return evalMachineDriver(mach, input);
+    public static ArrayList<Trace> evalMachine(Machine argMach, ArrayList<Character> input) {
+        argMach.getMachineTrace().clear();
+        return evalMachineDriver(argMach, input);
     }
 
-    public static ArrayList<Trace> evalMachineDriver(Machine mach, ArrayList<Character> input) {
+    public static ArrayList<Trace> evalMachineDriver(Machine argMach, ArrayList<Character> input) {
         ArrayList<Trace> allPossibleTraces = new ArrayList<>();
         if (input.isEmpty()) {
-            allPossibleTraces.add(mach.getMachineTrace());
+            allPossibleTraces.add(argMach.getMachineTrace());
             return allPossibleTraces;
         } else {
             try {
-                mach.setInputSequence(input);
-                ArrayList<Transition> transitions = Utilities.getApplicableTransitions(mach.getCurrentState()
-                        , mach.getNextInputToken());
+                argMach.setInputSequence(input);
+                ArrayList<Transition> transitions = Utilities.getApplicableTransitions(argMach.getCurrentState()
+                        , argMach.getNextInputToken());
                 for (Transition t : transitions) {
-                    Machine clone = mach.makeCurrentMachineCopy();
+                    Machine clone = argMach.makeCurrentMachineCopy();
                     clone.takeTransition(Utilities.findTransition(t, clone));
-                    // didnt fucking work ...
-                    ArrayList<Trace> trace = evalMachine(clone, mach.getInputSequence());
+                    ArrayList<Trace> trace = evalMachineDriver(clone, argMach.getInputSequence());
                     allPossibleTraces.addAll(trace);
                 }
             } catch (Exception e) {

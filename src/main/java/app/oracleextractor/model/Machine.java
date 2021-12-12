@@ -82,7 +82,7 @@ public class Machine {
         // Machine sample = Utilities.getDefaultMachine();
         Machine simpleMachine = Utilities.getAltMachine();
 
-        System.out.println("Size of the trace: " + Utilities.evalMachine(simpleMachine, Utilities.stringToList("a")).size());
+        System.out.println("Size of the trace: " + Utilities.evalMachine(simpleMachine, Utilities.stringToList("abab")).size());
         // System.out.println("Hello");
         // simpleMachine.nonDeterministicConsume(false);
     }

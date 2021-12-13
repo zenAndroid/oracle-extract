@@ -1,19 +1,15 @@
 package app.oracleextractor;
 
 import app.oracleextractor.model.Machine;
-import app.oracleextractor.model.State;
-import app.oracleextractor.model.Transition;
 import app.oracleextractor.model.exceptions.BadInputException;
 import app.oracleextractor.model.exceptions.NoLastChange;
 import app.oracleextractor.model.exceptions.NoPendingInput;
+import app.oracleextractor.model.utils.Reader;
 import app.oracleextractor.model.utils.Utilities;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -22,10 +18,11 @@ import javafx.stage.Window;
 
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class DebugController implements Initializable {
+    @FXML
+    MenuItem loadMachMenuItem;
     @FXML
     TextArea execLogTextArea;
 
@@ -116,7 +113,7 @@ public class DebugController implements Initializable {
             updateUI();
         });
 
-        saveLogButton.setOnAction((actionEvent -> {
+        saveLogButton.setOnAction(actionEvent -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose logfile save location");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text files", "*.txt"));
@@ -131,9 +128,28 @@ public class DebugController implements Initializable {
                 Utilities.getPopup("File exception", "IOException: A problem occurred while saving the file").showAndWait();
                 e.printStackTrace();
             }
+        });
 
-
-        }));
+        loadMachMenuItem.setOnAction(actionEvent -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Choose machine file location");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text files", "*.txt"));
+            Node sauce = loadMachMenuItem.getParentPopup().getOwnerNode();
+            Window theStage = sauce.getScene().getWindow();
+            File out = fileChooser.showOpenDialog(theStage);
+            if (out == null) {
+                System.err.println("File issue: out is null so there was an I/O problem.");
+            } else {
+                try {
+                    machineOfInterest = Reader.parseMachine(out);
+                    cloneOfInterest = machineOfInterest.makeMachineCopy();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                log(LOGTYPE.NEW_MACHINE_LOADED);
+                updateUI();
+            }
+        });
     }
 
     public void log(LOGTYPE type) {
@@ -144,12 +160,13 @@ public class DebugController implements Initializable {
             case STEP_ENTRY -> {
                 try {
                     newContent = machineOfInterest.getMachineTrace().getLastChange().toString() + '\n';
-                } catch (NoLastChange e){
+                } catch (NoLastChange e) {
                     newContent = "";
                 }
             }
             case RUN_ENTRY -> newContent = "Complete machine execution.\n" + machineOfInterest.getMachineTrace().toString() + '\n';
             case RESET_MACHINE_ENTRY -> newContent = "Machine reset to initial state.\n";
+            case NEW_MACHINE_LOADED -> newContent = "New machine loaded.\n";
         }
         execLogTextArea.setText(existingContent + newContent);
     }
@@ -194,7 +211,7 @@ public class DebugController implements Initializable {
         lblCurrentState.setText("Current State: " + machineOfInterest.getCurrentState().stateName());
         try {
             lblLastOutput.setText("Last Output: " + machineOfInterest.getLastOutput());
-        } catch (NoLastChange e){
+        } catch (NoLastChange e) {
             lblLastOutput.setText("Last Output: NONE");
         }
         lblOutput.setText("Output accumulator: " + machineOfInterest.getProducedOutput());
@@ -219,6 +236,7 @@ public class DebugController implements Initializable {
         STEP_ENTRY,
         RUN_ENTRY,
         RESET_MACHINE_ENTRY,
+        NEW_MACHINE_LOADED
 
     }
 }

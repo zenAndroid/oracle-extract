@@ -17,133 +17,119 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="800.0" minWidth="1300.0" prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.oracleextractor.MainController">
-    <children>
-        <ButtonBar buttonMinWidth="175.0" prefHeight="40.0" prefWidth="200.0">
-            <buttons>
-                <Button fx:id="loadImpreciseButton" mnemonicParsing="false" onAction="#loadImpreciseOracle" text="Load an imprecise oracle" />
-                <Button fx:id="loadTestSuiteButton" mnemonicParsing="false" onAction="#loadTestSuite" text="Load initial test suite" />
-                <Button fx:id="startMiningButton" mnemonicParsing="false" onAction="#startMining" text="Start mining" />
-                <Button fx:id="stopMiningButton" mnemonicParsing="false" onAction="#stopMining" text="Stop mining" />
-            </buttons>
-            <VBox.margin>
-                <Insets />
-            </VBox.margin>
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </ButtonBar>
-        <TabPane VBox.vgrow="ALWAYS">
-            <tabs>
-                <Tab closable="false" text="UI">
-                    <content>
-                        <GridPane prefHeight="490.0" prefWidth="828.0">
-                            <columnConstraints>
-                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                            </columnConstraints>
-                            <rowConstraints>
-                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            </rowConstraints>
-                            <children>
-                                <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Imprecise Oracle" GridPane.columnSpan="2">
-                                    <content>
-                                        <VBox prefHeight="200.0" prefWidth="100.0">
-                                            <children>
-                                                <WebView fx:id="impreciseOracleView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                                                <ButtonBar buttonMinWidth="150.0" prefHeight="40.0" prefWidth="686.0">
-                                                    <buttons>
-                                                        <Button fx:id="zoomOutImpreciseButton" mnemonicParsing="false" onAction="#zoomOutOnImprecise" text="Zoom out" />
-                                                        <Button fx:id="zoomResetImpreciseButton" mnemonicParsing="false" onAction="#zoomResetOnImprecise" text="Reset zoom level" />
-                                                        <Button fx:id="zoomInImpreciseButton" mnemonicParsing="false" onAction="#zoomInOnImprecise" text="Zoom in" />
-                                                    </buttons>
-                                                </ButtonBar>
-                                            </children>
-                                        </VBox>
-                                    </content>
-                                </TitledPane>
-                                <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="342.0" prefWidth="707.0" text="Partial Oracle" GridPane.columnSpan="2" GridPane.rowIndex="1">
-                                    <content>
-                                        <VBox prefHeight="200.0" prefWidth="100.0">
-                                            <children>
-                                                <WebView fx:id="partialOracleView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                                                <ButtonBar buttonMinWidth="150.0" prefHeight="40.0" prefWidth="200.0">
-                                                    <buttons>
-                                                        <Button fx:id="zoomOutPartialButton" mnemonicParsing="false" onAction="#zoomOutOnPartial" text="Zoom out" />
-                                                        <Button fx:id="zoomResetPartialButton" mnemonicParsing="false" onAction="#zoomResetOnPartial" text="Reset zoom level" />
-                                                        <Button fx:id="zoomInPartialButton" mnemonicParsing="false" onAction="#zoomInOnPartial" text="Zoom in" />
-                                                    </buttons>
-                                                    <VBox.margin>
-                                                        <Insets />
-                                                    </VBox.margin>
-                                                    <padding>
-                                                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-                                                    </padding>
-                                                </ButtonBar>
-                                            </children>
-                                        </VBox>
-                                    </content>
-                                </TitledPane>
-                                <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowSpan="2">
-                                    <children>
-                                        <TitledPane animated="false" collapsible="false" text="Input sequence">
-                                            <content>
-                                                <HBox prefHeight="14.0" prefWidth="245.0">
-                                                    <children>
-                                                        <Label fx:id="inSeq" text="Label" />
-                                                    </children>
-                                                </HBox>
-                                            </content>
-                                        </TitledPane>
-                                        <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Plausible output sequences" VBox.vgrow="ALWAYS">
-                                            <content>
-                                                <VBox prefHeight="200.0" prefWidth="100.0">
-                                                    <children>
-                                                        <ListView fx:id="outputSeqList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                                                        <ButtonBar prefHeight="40.0" prefWidth="200.0">
-                                                            <buttons>
-                                                                <Button fx:id="proceedButton" mnemonicParsing="false" onAction="#proceedWithOutputSeq" text="Proceed with selected output sequence" />
-                                                            </buttons>
-                                                        </ButtonBar>
-                                                    </children>
-                                                </VBox>
-                                            </content>
-                                        </TitledPane>
-                                        <TitledPane animated="false" collapsible="false" text="Initial test suite">
-                                            <content>
-                                                <HBox prefHeight="18.0" prefWidth="245.0">
-                                                    <children>
-                                                        <ComboBox prefWidth="150.0" />
-                                                    </children>
-                                                </HBox>
-                                            </content>
-                                        </TitledPane>
-                                    </children>
-                                </VBox>
-                            </children>
-                        </GridPane>
-                    </content>
-                </Tab>
-                <Tab closable="false" text="Execution log">
-                    <content>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="800.0" minWidth="1300.0" prefHeight="700.0"
+      prefWidth="900.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="app.oracleextractor.MainController">
+    <ButtonBar buttonMinWidth="175.0" prefHeight="40.0" prefWidth="200.0">
+        <buttons>
+            <Button fx:id="loadImpreciseButton" mnemonicParsing="false" text="Load an imprecise oracle"/>
+            <Button fx:id="loadTestSuiteButton" mnemonicParsing="false" text="Load initial test suite"/>
+            <Button fx:id="startMiningButton" mnemonicParsing="false" text="Start mining"/>
+            <Button fx:id="stopMiningButton" mnemonicParsing="false" text="Stop mining"/>
+        </buttons>
+        <VBox.margin>
+            <Insets/>
+        </VBox.margin>
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        </padding>
+    </ButtonBar>
+    <TabPane VBox.vgrow="ALWAYS">
+        <Tab closable="false" text="UI">
+            <GridPane prefHeight="490.0" prefWidth="828.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308"
+                            maxWidth="1.7976931348623157E308" text="Imprecise Oracle"
+                            GridPane.columnSpan="2">
+                    <VBox prefHeight="200.0" prefWidth="100.0">
+                        <WebView fx:id="impreciseOracleView" prefHeight="200.0" prefWidth="200.0"
+                                 VBox.vgrow="ALWAYS"/>
+                        <ButtonBar buttonMinWidth="150.0" prefHeight="40.0" prefWidth="686.0">
+                            <buttons>
+                                <Button fx:id="zoomOutImpreciseButton" mnemonicParsing="false"
+                                        text="Zoom out"/>
+                                <Button fx:id="zoomResetImpreciseButton" mnemonicParsing="false"
+                                        text="Reset zoom level"/>
+                                <Button fx:id="zoomInImpreciseButton" mnemonicParsing="false"
+                                        text="Zoom in"/>
+                            </buttons>
+                        </ButtonBar>
+                    </VBox>
+                </TitledPane>
+                <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308"
+                            maxWidth="1.7976931348623157E308" prefHeight="342.0" prefWidth="707.0"
+                            text="Partial Oracle" GridPane.columnSpan="2" GridPane.rowIndex="1">
+                    <VBox prefHeight="200.0" prefWidth="100.0">
+                        <WebView fx:id="partialOracleView" prefHeight="200.0" prefWidth="200.0"
+                                 VBox.vgrow="ALWAYS"/>
+                        <ButtonBar buttonMinWidth="150.0" prefHeight="40.0" prefWidth="200.0">
+                            <buttons>
+                                <Button fx:id="zoomOutPartialButton" mnemonicParsing="false"
+                                        text="Zoom out"/>
+                                <Button fx:id="zoomResetPartialButton" mnemonicParsing="false"
+                                        text="Reset zoom level"/>
+                                <Button fx:id="zoomInPartialButton" mnemonicParsing="false"
+                                        text="Zoom in"/>
+                            </buttons>
+                            <VBox.margin>
+                                <Insets/>
+                            </VBox.margin>
+                            <padding>
+                                <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+                            </padding>
+                        </ButtonBar>
+                    </VBox>
+                </TitledPane>
+                <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowSpan="2">
+                    <TitledPane animated="false" collapsible="false" text="Input sequence">
+                        <HBox prefHeight="14.0" prefWidth="245.0">
+                            <Label fx:id="inSeq" text="Label"/>
+                        </HBox>
+                    </TitledPane>
+                    <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308"
+                                maxWidth="1.7976931348623157E308" text="Plausible output sequences"
+                                VBox.vgrow="ALWAYS">
                         <VBox prefHeight="200.0" prefWidth="100.0">
-                            <children>
-                                <TextArea fx:id="executionLogTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                                <ButtonBar buttonMinWidth="175.0" prefHeight="40.0" prefWidth="200.0">
-                                    <buttons>
-                                        <Button fx:id="clearLogButton" mnemonicParsing="false" onAction="#clearLog" text="Clear log" />
-                                    </buttons>
-                                    <padding>
-                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                    </padding>
-                                </ButtonBar>
-                            </children>
+                            <ListView fx:id="outputSeqList" maxHeight="1.7976931348623157E308"
+                                      maxWidth="1.7976931348623157E308" prefHeight="200.0"
+                                      prefWidth="200.0" VBox.vgrow="ALWAYS"/>
+                            <ButtonBar prefHeight="40.0" prefWidth="200.0">
+                                <buttons>
+                                    <Button fx:id="proceedButton" mnemonicParsing="false"
+                                            text="Proceed with selected output sequence"/>
+                                </buttons>
+                            </ButtonBar>
                         </VBox>
-                    </content>
-                </Tab>
-            </tabs>
-        </TabPane>
-    </children>
+                    </TitledPane>
+                    <TitledPane animated="false" collapsible="false" text="Initial test suite">
+                        <HBox prefHeight="18.0" prefWidth="245.0">
+                            <ComboBox prefWidth="150.0"/>
+                        </HBox>
+                    </TitledPane>
+                </VBox>
+            </GridPane>
+        </Tab>
+        <Tab closable="false" text="Execution log">
+            <VBox prefHeight="200.0" prefWidth="100.0">
+                <TextArea fx:id="executionLogTextArea" editable="false" prefHeight="200.0" prefWidth="200.0"
+                          VBox.vgrow="ALWAYS"/>
+                <ButtonBar buttonMinWidth="175.0" prefHeight="40.0" prefWidth="200.0">
+                    <buttons>
+                        <Button fx:id="clearLogButton" mnemonicParsing="false" text="Clear log"/>
+                    </buttons>
+                    <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </padding>
+                </ButtonBar>
+            </VBox>
+        </Tab>
+    </TabPane>
 </VBox>

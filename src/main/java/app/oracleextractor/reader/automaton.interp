@@ -48,7 +48,7 @@ GRAPH_ORIENTATION
 
 rule names:
 automatonGraph
-statements
+statement
 trigger_output
 initArrow
 

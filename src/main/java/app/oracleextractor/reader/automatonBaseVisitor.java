@@ -24,7 +24,7 @@ public class automatonBaseVisitor<T> extends AbstractParseTreeVisitor<T> impleme
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitStatements(automatonParser.StatementsContext ctx) { return visitChildren(ctx); }
+	@Override public T visitStatement(automatonParser.StatementContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

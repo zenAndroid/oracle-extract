@@ -20,9 +20,9 @@ grammar automaton;
 */
 
 
-automatonGraph: 'digraph' AUTOMATON_NAME '{' initArrow statements* '}'<EOF>;
+automatonGraph: 'digraph' AUTOMATON_NAME '{' initArrow statement* '}'<EOF>;
 
-statements: STATE_NAME '->' STATE_NAME '[label=' trigger_output '];';
+statement: STATE_NAME '->' STATE_NAME '[label=' trigger_output '];';
 
 trigger_output: '"' TRIGGER '/' OUTPUT '"';
 

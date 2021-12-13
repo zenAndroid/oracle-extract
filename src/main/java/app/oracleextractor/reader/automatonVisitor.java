@@ -17,11 +17,11 @@ public interface automatonVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAutomatonGraph(automatonParser.AutomatonGraphContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link automatonParser#statements}.
+	 * Visit a parse tree produced by {@link automatonParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitStatements(automatonParser.StatementsContext ctx);
+	T visitStatement(automatonParser.StatementContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link automatonParser#trigger_output}.
 	 * @param ctx the parse tree

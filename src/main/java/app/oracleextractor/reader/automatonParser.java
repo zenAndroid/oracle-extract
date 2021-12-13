@@ -22,11 +22,11 @@ public class automatonParser extends Parser {
 		AUTOMATON_NAME=17, POINT_TO_INITIAL=18, CURRENT_FORM=19, CIRCULAR_SHAPE_STATES=20, 
 		GRAPH_ORIENTATION=21;
 	public static final int
-		RULE_automatonGraph = 0, RULE_statements = 1, RULE_trigger_output = 2, 
+		RULE_automatonGraph = 0, RULE_statement = 1, RULE_trigger_output = 2, 
 		RULE_initArrow = 3;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"automatonGraph", "statements", "trigger_output", "initArrow"
+			"automatonGraph", "statement", "trigger_output", "initArrow"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
@@ -102,11 +102,11 @@ public class automatonParser extends Parser {
 		public InitArrowContext initArrow() {
 			return getRuleContext(InitArrowContext.class,0);
 		}
-		public List<StatementsContext> statements() {
-			return getRuleContexts(StatementsContext.class);
+		public List<StatementContext> statement() {
+			return getRuleContexts(StatementContext.class);
 		}
-		public StatementsContext statements(int i) {
-			return getRuleContext(StatementsContext.class,i);
+		public StatementContext statement(int i) {
+			return getRuleContext(StatementContext.class,i);
 		}
 		public AutomatonGraphContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -149,7 +149,7 @@ public class automatonParser extends Parser {
 				{
 				{
 				setState(12);
-				statements();
+				statement();
 				}
 				}
 				setState(17);
@@ -171,7 +171,7 @@ public class automatonParser extends Parser {
 		return _localctx;
 	}
 
-	public static class StatementsContext extends ParserRuleContext {
+	public static class StatementContext extends ParserRuleContext {
 		public List<TerminalNode> STATE_NAME() { return getTokens(automatonParser.STATE_NAME); }
 		public TerminalNode STATE_NAME(int i) {
 			return getToken(automatonParser.STATE_NAME, i);
@@ -179,28 +179,28 @@ public class automatonParser extends Parser {
 		public Trigger_outputContext trigger_output() {
 			return getRuleContext(Trigger_outputContext.class,0);
 		}
-		public StatementsContext(ParserRuleContext parent, int invokingState) {
+		public StatementContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_statements; }
+		@Override public int getRuleIndex() { return RULE_statement; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof automatonListener ) ((automatonListener)listener).enterStatements(this);
+			if ( listener instanceof automatonListener ) ((automatonListener)listener).enterStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof automatonListener ) ((automatonListener)listener).exitStatements(this);
+			if ( listener instanceof automatonListener ) ((automatonListener)listener).exitStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof automatonVisitor ) return ((automatonVisitor<? extends T>)visitor).visitStatements(this);
+			if ( visitor instanceof automatonVisitor ) return ((automatonVisitor<? extends T>)visitor).visitStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final StatementsContext statements() throws RecognitionException {
-		StatementsContext _localctx = new StatementsContext(_ctx, getState());
-		enterRule(_localctx, 2, RULE_statements);
+	public final StatementContext statement() throws RecognitionException {
+		StatementContext _localctx = new StatementContext(_ctx, getState());
+		enterRule(_localctx, 2, RULE_statement);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{

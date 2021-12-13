@@ -18,15 +18,15 @@ public interface automatonListener extends ParseTreeListener {
 	 */
 	void exitAutomatonGraph(automatonParser.AutomatonGraphContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link automatonParser#statements}.
+	 * Enter a parse tree produced by {@link automatonParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void enterStatements(automatonParser.StatementsContext ctx);
+	void enterStatement(automatonParser.StatementContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link automatonParser#statements}.
+	 * Exit a parse tree produced by {@link automatonParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void exitStatements(automatonParser.StatementsContext ctx);
+	void exitStatement(automatonParser.StatementContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link automatonParser#trigger_output}.
 	 * @param ctx the parse tree

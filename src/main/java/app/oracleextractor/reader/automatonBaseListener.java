@@ -28,13 +28,13 @@ public class automatonBaseListener implements automatonListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStatements(automatonParser.StatementsContext ctx) { }
+	@Override public void enterStatement(automatonParser.StatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitStatements(automatonParser.StatementsContext ctx) { }
+	@Override public void exitStatement(automatonParser.StatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

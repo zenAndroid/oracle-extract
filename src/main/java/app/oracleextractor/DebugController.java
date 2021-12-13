@@ -47,6 +47,8 @@ public class DebugController implements Initializable {
 
     WebEngine engine;
 
+    static Machine parsedMachine; // Trying to add this in to see if i can parse a machine.
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeUIElements();

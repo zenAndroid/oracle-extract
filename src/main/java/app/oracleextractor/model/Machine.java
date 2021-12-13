@@ -3,6 +3,7 @@ package app.oracleextractor.model;
 import app.oracleextractor.model.exceptions.*;
 import app.oracleextractor.model.utils.Trace;
 import app.oracleextractor.model.utils.Utilities;
+import org.antlr.v4.runtime.ANTLRInputStream;
 
 import java.util.ArrayList;
 import java.util.Arrays;

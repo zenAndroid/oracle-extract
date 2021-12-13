@@ -203,11 +203,6 @@ public class Utilities {
     }
 
     public static ArrayList<Trace> evalMachine(Machine argMach, ArrayList<Character> input) {
-        argMach.getMachineTrace().clear();
-        return evalMachineDriver(argMach, input);
-    }
-
-    public static ArrayList<Trace> evalMachineDriver(Machine argMach, ArrayList<Character> input) {
         ArrayList<Trace> allPossibleTraces = new ArrayList<>();
         if (input.isEmpty()) {
             allPossibleTraces.add(argMach.getMachineTrace());
@@ -220,7 +215,7 @@ public class Utilities {
                 for (Transition t : transitions) {
                     Machine clone = argMach.makeCurrentMachineCopy();
                     clone.takeTransition(Utilities.findTransition(t, clone));
-                    ArrayList<Trace> trace = evalMachineDriver(clone, argMach.getInputSequence());
+                    ArrayList<Trace> trace = evalMachine(clone, argMach.getInputSequence());
                     allPossibleTraces.addAll(trace);
                 }
             } catch (Exception e) {

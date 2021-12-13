@@ -24,12 +24,10 @@ public class Reader {
 
         ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
 
-        parseTreeWalker.walk(new AutomatonListener(), parseTree);
+        AutomatonListener automatonListener = new AutomatonListener();
 
-        System.out.println(parseTree.toStringTree(automatonParser));
-        //  for (int i = 0; i < parseTree.getChildCount(); i++) {
-        //      System.out.println(parseTree.getChild(i));
-        //      ParseTree el = parseTree.getChild(8);
-        // }
+        parseTreeWalker.walk(automatonListener, parseTree);
+
+        System.out.println(automatonListener.getParsedMachine());
     }
 }

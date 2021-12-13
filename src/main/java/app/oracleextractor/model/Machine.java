@@ -61,8 +61,15 @@ public class Machine {
         this.machineTrace = new Trace();
     }
 
+    @Override
+    public String toString() {
+        return "Machine{" +
+                "states=" + states +
+                '}';
+    }
+
     public Machine() {
-        this.pendingInput = false;
+        pendingInput = false;
         states = new ArrayList<>();
         initialState = State.getState();
         currentState = initialState;
@@ -70,8 +77,8 @@ public class Machine {
         inputAlphabet = Set.of();
         outputAlphabet = Set.of();
         producedOutput = new ArrayList<>();
-        this.machineTransitions = new ArrayList<>();
-        this.machineTrace = new Trace();
+        machineTransitions = new ArrayList<>();
+        machineTrace = new Trace();
     }
 
     /*

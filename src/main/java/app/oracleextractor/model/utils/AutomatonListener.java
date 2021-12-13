@@ -1,5 +1,6 @@
 package app.oracleextractor.model.utils;
 
+import app.oracleextractor.model.Machine;
 import app.oracleextractor.model.State;
 import app.oracleextractor.model.Transition;
 import app.oracleextractor.model.exceptions.StateNotFound;
@@ -7,6 +8,7 @@ import app.oracleextractor.reader.automatonBaseListener;
 import app.oracleextractor.reader.automatonParser;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 public class AutomatonListener extends automatonBaseListener {
@@ -34,8 +36,29 @@ public class AutomatonListener extends automatonBaseListener {
     }
     */
     ArrayList<State> listenerStates = new ArrayList<>();
-    ArrayList<Transition> listenerTransitions= new ArrayList<>();
+    ArrayList<Transition> listenerTransitions = new ArrayList<>();
+    Set<Character> listenerInputAlphabet = new HashSet<>();
+    Set<Character> listenerOutputAlphabet = new HashSet<>();
+    String initStatename = "";
+    Machine parsedMachine; // Trying to add this in to see if i can parse a machine.
 
+    public void initParsedMachine() {
+        parsedMachine = new Machine();
+        try {
+            parsedMachine.setInitialState(Utilities.getStateByName(listenerStates, initStatename));
+        } catch (StateNotFound e) {
+            System.err.println("OOF, this shouldn't happen, initial state wasnt founf among the array of all states!");
+            e.printStackTrace();
+        }
+        parsedMachine.setInputAlphabet(listenerInputAlphabet);
+        parsedMachine.setOutputAlphabet(listenerOutputAlphabet);
+        parsedMachine.setStates(listenerStates);
+        parsedMachine.setMachineTransitions(listenerTransitions);
+    }
+
+    public Machine getParsedMachine() {
+        return parsedMachine;
+    }
 
     @Override
     public void enterStatement(automatonParser.StatementContext ctx) {
@@ -45,6 +68,10 @@ public class AutomatonListener extends automatonBaseListener {
         String destName = ctx.STATE_NAME(1).getText();
         char trigger = ctx.trigger_output().TRIGGER().getText().charAt(0);
         char output = ctx.trigger_output().OUTPUT().getText().charAt(0);
+        // add the trigger to the machine's input alphabet.
+        listenerInputAlphabet.add(trigger);
+        // same for output
+        listenerOutputAlphabet.add(output);
         try {
             source = Utilities.getStateByName(listenerStates, sourceName);
         } catch (StateNotFound e) {
@@ -61,7 +88,7 @@ public class AutomatonListener extends automatonBaseListener {
         Transition thisTransition = Transition.getInstance(trigger, output, source, dest);
         listenerTransitions.add(thisTransition);
         // Need to test
-        System.out.println(thisTransition);
+        // System.out.println(thisTransition);
     }
 
     @Override
@@ -70,13 +97,13 @@ public class AutomatonListener extends automatonBaseListener {
 
     @Override
     public void enterInitArrow(automatonParser.InitArrowContext ctx) {
-        String initialStateName = ctx.STATE_NAME().getText();
-        State initial = State.getState(initialStateName);
-        System.out.println(initial);
+        initStatename = ctx.STATE_NAME().getText();
     }
 
-    @Override public void exitAutomatonGraph(automatonParser.AutomatonGraphContext ctx) {
-        System.out.println(listenerStates.size());
-        System.out.println(listenerTransitions.size());
+    @Override
+    public void exitAutomatonGraph(automatonParser.AutomatonGraphContext ctx) {
+        // We are done with parsing the automaton if this method is executed.
+
+        initParsedMachine();
     }
 }

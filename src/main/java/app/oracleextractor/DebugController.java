@@ -1,6 +1,8 @@
 package app.oracleextractor;
 
 import app.oracleextractor.model.Machine;
+import app.oracleextractor.model.State;
+import app.oracleextractor.model.Transition;
 import app.oracleextractor.model.exceptions.BadInputException;
 import app.oracleextractor.model.exceptions.NoLastChange;
 import app.oracleextractor.model.exceptions.NoPendingInput;
@@ -20,6 +22,7 @@ import javafx.stage.Window;
 
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class DebugController implements Initializable {
@@ -47,7 +50,6 @@ public class DebugController implements Initializable {
 
     WebEngine engine;
 
-    static Machine parsedMachine; // Trying to add this in to see if i can parse a machine.
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

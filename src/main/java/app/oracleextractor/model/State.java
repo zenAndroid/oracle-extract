@@ -20,7 +20,7 @@ import java.util.Arrays;
  */
 public class State {
     static int id = 0;
-    Machine mach;
+    Machine mach;//
     String stateName;
 
     /**

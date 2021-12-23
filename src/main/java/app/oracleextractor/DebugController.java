@@ -4,7 +4,6 @@ import app.oracleextractor.model.Machine;
 import app.oracleextractor.model.exceptions.BadInputException;
 import app.oracleextractor.model.exceptions.NoLastChange;
 import app.oracleextractor.model.exceptions.NoPendingInput;
-import app.oracleextractor.model.utils.Reader;
 import app.oracleextractor.model.utils.Utilities;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -141,7 +140,7 @@ public class DebugController implements Initializable {
                 System.err.println("File issue: out is null so there was an I/O problem.");
             } else {
                 try {
-                    machineOfInterest = Reader.parseMachine(out);
+                    machineOfInterest = Utilities.parseMachine(out);
                     cloneOfInterest = machineOfInterest.makeMachineCopy();
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -5,8 +5,9 @@ import app.oracleextractor.model.State;
 import app.oracleextractor.model.Transition;
 import app.oracleextractor.model.exceptions.NoTransitionFound;
 import app.oracleextractor.model.exceptions.StateNotFound;
-import app.oracleextractor.model.exceptions.StuckMachineException;
 import app.oracleextractor.model.exceptions.TransitionNotFound;
+import app.oracleextractor.reader.automatonLexer;
+import app.oracleextractor.reader.automatonParser;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -22,7 +23,15 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -265,5 +274,19 @@ public class Utilities {
             retVal.append(ch);
         }
         return retVal.toString();
+    }
+
+    public static Machine parseMachine(File file) throws IOException {
+        Path filePath = file.toPath();
+        CharStream fileName = CharStreams.fromPath(filePath);
+        automatonLexer automatonLexer = new automatonLexer(fileName);
+        CommonTokenStream commonTokenStream = new CommonTokenStream(automatonLexer);
+        automatonParser automatonParser = new automatonParser(commonTokenStream);
+        ParseTree parseTree = automatonParser.automatonGraph(); // Start this rule!
+        ParseTreeWalker parseTreeWalker = new ParseTreeWalker(); // Tree walker!
+        AutomatonListener automatonListener = new AutomatonListener(); // Tree listener!
+        parseTreeWalker.walk(automatonListener, parseTree); // Walk the parseTree with the listener!
+
+        return automatonListener.getParsedMachine();
     }
 }

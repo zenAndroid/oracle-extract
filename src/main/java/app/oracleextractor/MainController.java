@@ -1,7 +1,6 @@
 package app.oracleextractor;
 
 import app.oracleextractor.model.Machine;
-import app.oracleextractor.model.utils.Reader;
 import app.oracleextractor.model.utils.Utilities;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -79,7 +78,7 @@ public class MainController implements Initializable {
             Window theStage = sauce.getScene().getWindow();
             File out = fileChooser.showOpenDialog(theStage);
             try {
-                machineOfInterest = Reader.parseMachine(out);
+                machineOfInterest = Utilities.parseMachine(out);
                 cloneOfInterest = machineOfInterest.makeMachineCopy();
                 log("New oracle loaded.");
                 updateUI();
@@ -135,30 +134,6 @@ public class MainController implements Initializable {
             case OUT -> targetView.setZoom(targetView.getZoom() - 0.1);
             case RESET -> targetView.setZoom(1.0);
         }
-    }
-
-    public void startMining() {
-        // TODO Auto-generated method stub
-        System.out.println("Controller.startMining()");
-        executionLogTextArea.appendText("Started Mining\n");
-    }
-
-    public void stopMining() {
-        // TODO Auto-generated method stub
-        System.out.println("Controller.stopMining()");
-        executionLogTextArea.appendText("Stopped Mining\n");
-    }
-
-    public void loadImpreciseOracle() {
-        // TODO Auto-generated method stub
-        System.out.println("Controller.loadImpreciseOracle()");
-        executionLogTextArea.appendText("Loaded Imprecise Oracle\n");
-    }
-
-    public void loadTestSuite() {
-        // TODO Auto-generated method stub
-        System.out.println("Controller.loadTestSuite()");
-        executionLogTextArea.appendText("Loaded Test Suite\n");
     }
 
     public void clearLog() {

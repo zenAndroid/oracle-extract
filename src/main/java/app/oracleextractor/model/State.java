@@ -23,7 +23,7 @@ public record State(String stateName, ArrayList<Transition> outGoing, ArrayList<
     }
 
     public void addIncomingTransition(Transition t) {
-        inComing.add(t); // lmao, tfw the final modifier in java does JACK SHIT
+        inComing.add(t);
     }
 
     public void addOutgoingTransition(Transition t) {
